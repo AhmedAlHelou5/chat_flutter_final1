@@ -1,6 +1,7 @@
 import 'package:chat_flutter_final/screen/auth_screen.dart';
 import 'package:chat_flutter_final/screen/list_user_screen.dart';
 import 'package:chat_flutter_final/screen/splash_screen.dart';
+import 'package:chat_flutter_final/widget/home_screen_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -11,6 +12,7 @@ void main() async {
 }
 class MyApp extends StatelessWidget {
   final Future<FirebaseApp> _initialization =Firebase.initializeApp();
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -40,7 +42,7 @@ class MyApp extends StatelessWidget {
                 return SplashScreen();
               }
               if (userSnapshot.hasData) {
-                return ListUserScreen();
+                return HomeScreenWidget();
               }
               return AuthScreen();
             }),

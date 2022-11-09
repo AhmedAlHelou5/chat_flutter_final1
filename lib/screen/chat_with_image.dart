@@ -90,16 +90,16 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
     try {
       final response = await InternetAddress.lookup('www.google.com');
       if (response.isNotEmpty) {
-        setState(() async {
+        setState(()  {
           _isConnected = true;
           final ref = FirebaseStorage.instance
               .ref().child('ChatRoom')
               .child(widget.groupChatId)
               .child(user.uid + '.jpg');
 
-          await ref.putFile(widget.imageUrl!);
+           ref.putFile(widget.imageUrl!);
 
-          final url = await ref.getDownloadURL();
+          final url =  ref.getDownloadURL();
 
           FirebaseFirestore.instance
               .collection('messages')

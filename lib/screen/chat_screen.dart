@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chat_flutter_final/widget/voice_call_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -141,6 +142,24 @@ class _ChatScreenState extends State<ChatScreen> {
                 )),
           ]),
           leadingWidth: 80,
+          // actions: [
+          // Container(
+          //     margin: EdgeInsets.only(right: 15, top:10),
+          //     child: IconButton(
+          //       icon: Icon(
+          //         Icons.call,
+          //         color: Theme.of(context).primaryIconTheme.color,
+          //         size: 27,
+          //       ), onPressed: () =>VoiceCallWidget(),),),
+          //         Container(
+          //             margin: EdgeInsets.only(right: 15, top:10),
+          //             child: IconButton(
+          //               icon: Icon(
+          //                 Icons.videocam_rounded,
+          //                 color: Theme.of(context).primaryIconTheme.color,
+          //                 size: 27,
+          //               ), onPressed: ()  =>VoiceCallWidget(),)),
+          // ],
         ),
         //      actions: [
         //   Container(

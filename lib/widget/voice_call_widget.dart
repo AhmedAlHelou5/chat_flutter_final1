@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
-import 'package:flutter/material.dart';
 
-const appId = "com.ahmed.chat_flutter_final";
-const token = "<-- Insert Token -->";
+const appId = "9e080d5df26340a0a382743bf5c9abf2";
+const token = "NETLESSSDK_YWs9MDl4Zk5TaHJESFF5RlZRdSZub25jZT1hYTBhMWE3MC01ZWFmLTExZWQtOTUyOC1hOTFkNjg2NjcwMjcmcm9sZT0wJnNpZz04ZTA2OTAzMmUwYWZhYzM1ODVjMGI2NDhhNDJkMTc2Yzg3MGRjNGUwYTA3YTY2NzE1NWUzNTM3NGQ2ODE0MTJj";
 const channel = "chatApp";
 class VoiceCallWidget extends StatefulWidget {
   const VoiceCallWidget({Key? key}) : super(key: key);
@@ -16,7 +15,7 @@ class VoiceCallWidget extends StatefulWidget {
 class _VoiceCallWidgetState extends State<VoiceCallWidget> {
   int? _remoteUid;
   bool _localUserJoined = false;
-  late RtcEngine _engine;
+   late RtcEngine _engine;
 
 
   @override
@@ -70,9 +69,9 @@ class _VoiceCallWidgetState extends State<VoiceCallWidget> {
 
     await _engine.joinChannel(
       token: token,
-      channelId: channel,
-      uid: 0, options: ChannelMediaOptions(autoSubscribeAudio: true),
-    );
+      channelId: 'chatApp',
+      uid: 0, options: ChannelMediaOptions(audioDelayMs: 1,autoSubscribeAudio: true) );
+
   }
 
   // Create UI with local view and remote view
