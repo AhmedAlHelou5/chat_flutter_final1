@@ -67,6 +67,8 @@ class _AuthScreenState extends State<AuthScreen> {
           'email': email,
           'password': password,
           'image_url': url,
+          'lastMessage': null,
+          'timeSend': null,
           'userId':authResult.user!.uid,
 
 

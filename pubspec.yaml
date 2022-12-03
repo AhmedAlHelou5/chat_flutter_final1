@@ -64,7 +64,14 @@ dependencies:
   gallery_saver: ^2.3.2
   external_path: ^1.0.3
   social_media_recorder: ^0.1.84
-  agora_rtc_engine: ^6.0.0-beta.2
+  anim_search_bar: ^2.0.2
+  fancy_bottom_navigation: ^0.3.3
+  flashy_tab_bar2: ^0.0.4
+  fsearch: ^2.0.0
+  flutter_instagram_stories: ^1.0.3
+  advstory: ^0.2.1
+  flutter_story_list: ^1.0.4+2
+  story_view: ^0.14.0
 
 
 dev_dependencies:
@@ -97,6 +104,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/a.png
+    - assets/images/b.jpg
 #     - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -10,32 +10,29 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:file_picker/file_picker.dart';
 
-class BottomSheetAttachFile extends StatefulWidget {
-  final String groupChatId;
-  final String username;
-  final String image;
-  final String userId2;
+import '../screen/upload_story_screen.dart';
 
-  BottomSheetAttachFile(
-      this.groupChatId, this.username, this.image, this.userId2);
+
+class BottomSheetForStoryPick extends StatefulWidget{
 
   @override
-  State<BottomSheetAttachFile> createState() => _BottomSheetAttachFileState();
+  State<StatefulWidget> createState()=>_BottomSheetForStoryPickState();
+  
 }
-
-class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
+class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
   bool isLoading = true;
   File? file;
   var name;
   var value;
   String url = "";
+  final currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
   String imageUrl = "";
 
   getfile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf'],
+      allowedExtensions: ['mp4'],
     );
 
     if (result != null) {
@@ -45,25 +42,7 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
         name = result.names.toString();
       });
       Navigator.of(context).pop();
-     await  uploadFile('file');
-    }
-  }
-  getMp3() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['mp3'],
-    );
-
-    if (result != null) {
-      File c = File(result.files.single.path.toString());
-      setState(() {
-        file = c;
-        name = result.names.toString();
-        value = result.count.toString();
-      });
-      Navigator.of(context).pop();
-
-   await  uploadFile('mp3');
+      await  uploadFile('video');
     }
   }
   bool? _isConnected;
@@ -79,58 +58,48 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
           .doc(user.uid)
           .get();
       var currentUserId = user.uid;
-      var peerId = widget.userId2;
       final response = await InternetAddress.lookup('www.google.com');
       try {
         if (response.isNotEmpty) {
-        var imagefile = FirebaseStorage.instance.ref('ChatRoom').child(
-            '/file ${widget.groupChatId}').child("/${widget.username}");
-        UploadTask task = imagefile.putFile(file!);
-        TaskSnapshot snapshot = await task;
-        url = await snapshot.ref.getDownloadURL();
+          var imagefile = FirebaseStorage.instance.ref('Story').child(
+              '/story ${currentUserId}');
+          UploadTask task = imagefile.putFile(file!);
+          TaskSnapshot snapshot = await task;
+          url = await snapshot.ref.getDownloadURL();
 
-        await FirebaseFirestore.instance
-            .collection('messages')
-            .doc(widget.groupChatId)
-            .collection(widget.groupChatId)
-            .add({
-          'text': null,
-          'file': url,
-          'createdAt': Timestamp.now(),
-          'username': userData['username'],
-          'imageUrl': null,
-          'userId2': peerId,
-          'userId1': currentUserId,
-          'userImage': userData['image_url'],
-          'isStats': userData['isStats'],
-          'type': type,
-        });
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(peerId)
-            .update({
-          'lastMessage':null,
-          'timeSend':Timestamp.now()
-        });
+          await FirebaseFirestore.instance
+              .collection('stories')
+              .doc(currentUserId)
+              .collection(currentUserId)
+              .add({
+            'file': url,
+            'createdAt': Timestamp.now(),
+            'username': userData['username'],
+            'userId1': currentUserId,
+            'userImage': userData['image_url'],
+            'isStats': userData['isStats'],
+            'type': type,
+          });
 
-        if (url != null && file != null) {
-          Fluttertoast.showToast(
-            msg: "Done Uploaded",
-            textColor: Colors.red,
-          );
-        } else {
-          Fluttertoast.showToast(
-            msg: "Something went wrong",
-            textColor: Colors.red,
-          );
+
+          if (url != null && file != null) {
+            Fluttertoast.showToast(
+              msg: "Done Uploaded",
+              textColor: Colors.red,
+            );
+          } else {
+            Fluttertoast.showToast(
+              msg: "Something went wrong",
+              textColor: Colors.red,
+            );
+          }
         }
-      }
-    } on Exception catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-        textColor: Colors.red,
-      );
-    }}on SocketException catch (err) {
+      } on Exception catch (e) {
+        Fluttertoast.showToast(
+          msg: e.toString(),
+          textColor: Colors.red,
+        );
+      }}on SocketException catch (err) {
       setState(() {
         _isConnected = false;
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Don’t Send because No Internet connection')));
@@ -168,7 +137,7 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
                           radius: 30,
                           backgroundColor: Colors.indigo,
                           child: Icon(
-                            Icons.insert_drive_file,
+                            Icons.videocam,
                             // semanticLabel: "Help",
                             size: 29,
                             color: Colors.white,
@@ -178,7 +147,7 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
                           height: 5,
                         ),
                         Text(
-                          'Document',
+                          'Video',
                           style: TextStyle(
                             fontSize: 12,
                             // fontWeight: FontWeight.w100,
@@ -201,18 +170,18 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
                           .get();
 
                       final pickedImageFile =
-                          await _picker.pickImage(source: ImageSource.camera);
+                      await _picker.pickImage(source: ImageSource.camera);
                       if (pickedImageFile != null) {
                         setState(() {
                           _pickedImage = File(pickedImageFile.path);
                           Navigator.of(context).pop();
 
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ChatWithImageScreen(
-                                  _pickedImage!,
+                              builder: (context) => UploadStoryScreen(
+                                _pickedImage!,
                                   userData['username'],
-                                  widget.groupChatId,
-                                  widget.userId2)));
+
+                                )));
                         });
 
                       } else {
@@ -259,18 +228,16 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
                           .get();
 
                       final pickedImageFile =
-                          await _picker.getImage(source: ImageSource.gallery);
+                      await _picker.getImage(source: ImageSource.gallery);
                       if (pickedImageFile != null) {
                         setState(() {
                           _pickedImage = File(pickedImageFile.path);
                           Navigator.of(context).pop();
 
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => ChatWithImageScreen(
+                              builder: (context) => UploadStoryScreen(
                                   _pickedImage!,
-                                  userData['username'],
-                                  widget.groupChatId,
-                                  widget.userId2)));
+                                  userData['username'])));
 
                         });
 
@@ -305,38 +272,7 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    width: 30,
-                  ),
-                  InkWell(
-                    onTap: () async {
-                      await getMp3();
-                    },
-                    child: Column(
-                      children: const [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Colors.orange,
-                          child: Icon(
-                            Icons.headset,
-                            // semanticLabel: "Help",
-                            size: 29,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          'Audio',
-                          style: TextStyle(
-                            fontSize: 12,
-                            // fontWeight: FontWeight.w100,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
+
                 ],
               ),
             ],

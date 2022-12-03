@@ -32,21 +32,22 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
   var _isLoading = false;
   var emojiShowing = false;
 
-
+  FocusNode focusNode = FocusNode();
   final _controller = TextEditingController();
   var _enteredMessage = '';
   final _auth = FirebaseAuth.instance;
   late User signedInUser;
-  FocusNode focusNode = FocusNode();
 
-  void SetMe(bool me) {
-    FirebaseFirestore.instance
-        .collection('messages')
-        .doc(_auth.currentUser!.uid)
-        .update({
-      'isMe': me,
-    });
-  }
+  // void SetLastMessage(bool me,String lastMessage) {
+  //   FirebaseFirestore.instance
+  //       .collection('users')
+  //       .doc(_auth.currentUser!.uid)
+  //       .update({
+  //     'isMe': me,
+  //     'lastMessage':lastMessage,
+  //   });
+  // }
+
 
   void getCurrentUser() {
     try {
@@ -99,6 +100,15 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'isStats': userData['isStats'],
             'type': 'text',
           });
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(peerId)
+              .update({
+          'lastMessage':_enteredMessage,
+            'timeSend':Timestamp.now()
+
+          });
+
           _controller.clear();
           setState(() {
             _enteredMessage = '';
@@ -152,6 +162,14 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'userImage': userData['image_url'],
             'isStats': userData['isStats'],
             'type': 'mp3',
+          });
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(peerId)
+              .update({
+            'lastMessage':null,
+            'timeSend':Timestamp.now()
+
           });
           _controller.clear();
           setState(() {

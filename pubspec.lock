@@ -8,13 +8,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
-  agora_rtc_engine:
+  advstory:
     dependency: "direct main"
     description:
-      name: agora_rtc_engine
+      name: advstory
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.0.0"
+    version: "0.2.1"
+  anim_search_bar:
+    dependency: "direct main"
+    description:
+      name: anim_search_bar
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.2"
   animated_text_kit:
     dependency: transitive
     description:
@@ -169,6 +176,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.6"
+  dotted_border:
+    dependency: transitive
+    description:
+      name: dotted_border
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0+3"
   emoji_picker_flutter:
     dependency: "direct main"
     description:
@@ -190,6 +204,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.1"
+  fancy_bottom_navigation:
+    dependency: "direct main"
+    description:
+      name: fancy_bottom_navigation
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.3"
   ffi:
     dependency: transitive
     description:
@@ -295,6 +316,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.3.9"
+  flashy_tab_bar2:
+    dependency: "direct main"
+    description:
+      name: flashy_tab_bar2
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.0.4"
   flushbar:
     dependency: "direct main"
     description:
@@ -342,6 +370,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.0"
+  flutter_instagram_stories:
+    dependency: "direct main"
+    description:
+      name: flutter_instagram_stories
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.3"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -363,6 +398,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.7"
+  flutter_story_list:
+    dependency: "direct main"
+    description:
+      name: flutter_story_list
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.4+2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -387,6 +429,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.4"
+  fsearch:
+    dependency: "direct main"
+    description:
+      name: fsearch
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   gallery_saver:
     dependency: "direct main"
     description:
@@ -471,13 +520,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.17.0"
-  iris_event:
-    dependency: transitive
-    description:
-      name: iris_event
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.2.0"
   js:
     dependency: transitive
     description:
@@ -569,6 +611,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.8.2"
+  path_drawing:
+    dependency: transitive
+    description:
+      name: path_drawing
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   path_parsing:
     dependency: transitive
     description:
@@ -807,6 +856,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.1"
+  shimmer:
+    dependency: transitive
+    description:
+      name: shimmer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -847,6 +903,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.10.0"
+  story_view:
+    dependency: "direct main"
+    description:
+      name: story_view
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.14.0"
   stream_channel:
     dependency: transitive
     description:

@@ -1,4 +1,5 @@
 import 'package:chat_flutter_final/screen/auth_screen.dart';
+import 'package:chat_flutter_final/screen/home_screen_with_nav_bottom.dart';
 import 'package:chat_flutter_final/screen/list_user_screen.dart';
 import 'package:chat_flutter_final/screen/splash_screen.dart';
 import 'package:chat_flutter_final/widget/home_screen_widget.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
                 return SplashScreen();
               }
               if (userSnapshot.hasData) {
-                return HomeScreenWidget();
+                return HomeScreenWithNavBottom();
               }
               return AuthScreen();
             }),
