@@ -100,14 +100,32 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'isStats': userData['isStats'],
             'type': 'text',
           });
-          FirebaseFirestore.instance
-              .collection('users')
-              .doc(peerId)
-              .update({
-          'lastMessage':_enteredMessage,
-            'timeSend':Timestamp.now()
+          // FirebaseFirestore.instance
+          //     .collection('users')
+          //     .doc(peerId)
+          //     .update({
+          // 'lastMessage':_enteredMessage,
+          //   'timeSend':Timestamp.now()
+          //
+          // });
 
-          });
+          FirebaseFirestore.instance
+              .collection('last_message')
+              .doc(user.uid)
+              .collection(user.uid).doc(signedInUser.uid)
+              .set({
+            'text': _enteredMessage,
+            'timeSend': Timestamp.now(),
+            'username': userData['username'],
+            'userId2': peerId,
+            'userId1': currentUserId,
+            'userImage': userData['image_url'],
+            'isStats': userData['isStats'],
+            'type': 'text',});
+
+
+
+
 
           _controller.clear();
           setState(() {
@@ -146,8 +164,8 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
         url = await snapshot.ref.getDownloadURL();
 
         setState(() {
-          _isConnected = true;
-          FirebaseFirestore.instance
+          _isConnected = true; });
+        await  FirebaseFirestore.instance
               .collection('messages')
               .doc(widget.groupChatId)
               .collection(widget.groupChatId)
@@ -163,19 +181,28 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'isStats': userData['isStats'],
             'type': 'mp3',
           });
-          FirebaseFirestore.instance
-              .collection('users')
-              .doc(peerId)
-              .update({
-            'lastMessage':null,
-            'timeSend':Timestamp.now()
 
-          });
+
+        await  FirebaseFirestore.instance
+              .collection('last_message')
+              .doc(user.uid)
+              .collection(user.uid).doc(signedInUser.uid)
+              .set({
+            'text': url,
+            'timeSend': Timestamp.now(),
+            'username': userData['username'],
+            'userId2': peerId,
+            'userId1': currentUserId,
+            'userImage': userData['image_url'],
+            'isStats': userData['isStats'],
+            'type': 'voice',});
+
+
           _controller.clear();
           setState(() {
             _enteredMessage = '';
           });
-        });
+
       }
     } on SocketException catch (err) {
       setState(() {
@@ -188,70 +215,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
       }
     }
   }
-  // uploadFile(String type) async {
-  //
-  //   try {
-  //     final user = FirebaseAuth.instance.currentUser!;
-  //     final userData = await FirebaseFirestore.instance
-  //         .collection('users')
-  //         .doc(user.uid)
-  //         .get();
-  //     var currentUserId = user.uid;
-  //     var peerId = widget.userId2;
-  //     final response = await InternetAddress.lookup('www.google.com');
-  //     try {  if (response.isNotEmpty) {
-  //       var imagefile = FirebaseStorage.instance.ref('ChatRoom').child(
-  //           '/file ${widget.groupChatId}').child("/${widget.username}");
-  //       UploadTask task = imagefile.putFile(file!);
-  //       TaskSnapshot snapshot = await task;
-  //       url = await snapshot.ref.getDownloadURL();
-  //
-  //       await FirebaseFirestore.instance
-  //           .collection('messages')
-  //           .doc(widget.groupChatId)
-  //           .collection(widget.groupChatId)
-  //           .add({
-  //         'text': null,
-  //         'file': url,
-  //         'createdAt': Timestamp.now(),
-  //         'username': userData['username'],
-  //         'imageUrl': null,
-  //         'userId2': peerId,
-  //         'userId1': currentUserId,
-  //         'userImage': userData['image_url'],
-  //         'isStats': userData['isStats'],
-  //         'type': type,
-  //       });
-  //
-  //       if (url != null && file != null) {
-  //         Fluttertoast.showToast(
-  //           msg: "Done Uploaded",
-  //           textColor: Colors.red,
-  //         );
-  //       } else {
-  //         Fluttertoast.showToast(
-  //           msg: "Something went wrong",
-  //           textColor: Colors.red,
-  //         );
-  //       }
-  //     }
-  //     } on Exception catch (e) {
-  //       Fluttertoast.showToast(
-  //         msg: e.toString(),
-  //         textColor: Colors.red,
-  //       );
-  //     }}on SocketException catch (err) {
-  //     setState(() {
-  //       _isConnected = false;
-  //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Don’t Send because No Internet connection')));
-  //
-  //     });
-  //     if (kDebugMode) {
-  //       print(err);
-  //     }
-  //   }
-  //
-  // }
+
 
 
   @override
@@ -332,27 +296,6 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                       }),
                 ),
               ),
-              // Container(
-              //   transform: Matrix4.rotationZ(3 * pi / 100)..leftTranslate(8.0),
-              //   child: IconButton(
-              //     color: Theme.of(context).primaryColor,
-              //     disabledColor: Colors.pinkAccent[100],
-              //     onPressed: () {
-              //       showModalBottomSheet(
-              //         backgroundColor: Colors.transparent,
-              //         context: context,
-              //         builder: (builder) => BottomSheetAttachFile(
-              //             widget.groupChatId,
-              //             widget.username,
-              //             widget.image,
-              //             widget.userId2),
-              //       );
-              //     },
-              //     icon: const Icon(
-              //       Icons.attach_file_rounded,
-              //     ),
-              //   ),
-              // ),
               if( _enteredMessage.trim().isEmpty)
                 SingleChildScrollView(
                   scrollDirection: Axis.vertical,
@@ -362,6 +305,26 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                             sendRequestFunction: (soundFile)async {
                               print("the current path is ${soundFile.path}");
                               _sendMessageVoice(soundFile);
+
+                                setState(() async{
+
+                                      var imagefile = FirebaseStorage.instance.ref('ChatRoom').child(
+                                      '/file ${widget.groupChatId}').child("/${widget.username}");
+                                      UploadTask task = imagefile.putFile(soundFile);
+                                      TaskSnapshot snapshot = await task;
+                                    String  url = await snapshot.ref.getDownloadURL();
+
+                                  await FirebaseFirestore.instance
+                                      .collection('last_message')
+                                      .doc(signedInUser.uid)
+                                      .collection(signedInUser.uid).doc(signedInUser.uid)
+                                      .update({
+                                    'text':url,
+                                    'type':'voice',
+                                    'timeSend':Timestamp.now()
+                                  });
+                                });
+
 
                             },
 
@@ -391,7 +354,19 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
               if( _enteredMessage.trim().isNotEmpty)
               IconButton(
                   color: Theme.of(context).primaryColor,
-                  onPressed:  _sendMessage,
+                  onPressed:  () {
+                    _sendMessage();
+                    setState(() async {
+                     await FirebaseFirestore.instance
+                          .collection('last_message')
+                          .doc(signedInUser.uid)
+                          .collection(signedInUser.uid).doc(signedInUser.uid)
+                          .update({
+                        'text':_enteredMessage,
+                        'timeSend':Timestamp.now()
+                      });
+                    });
+                    },
                   icon: Icon(
                     Icons.send,
                   )),

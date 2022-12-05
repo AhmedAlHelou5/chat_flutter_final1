@@ -20,6 +20,7 @@ class ChatWithImageScreen extends StatefulWidget {
 
 class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
   final _controller = TextEditingController();
+  final currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
   String? _enteredMessage = '';
 
@@ -90,18 +91,18 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
     try {
       final response = await InternetAddress.lookup('www.google.com');
       if (response.isNotEmpty) {
-        setState(()  {
-          _isConnected = true;
           final ref = FirebaseStorage.instance
               .ref().child('ChatRoom')
               .child(widget.groupChatId)
-              .child(user.uid + '.jpg');
+              .child('${DateTime
+              .now()
+              .millisecondsSinceEpoch}.jpg');
 
-           ref.putFile(widget.imageUrl!);
+          await  ref.putFile(widget.imageUrl!);
 
-          final url =  ref.getDownloadURL();
+          final url = await ref.getDownloadURL();
 
-          FirebaseFirestore.instance
+        await  FirebaseFirestore.instance
               .collection('messages')
               .doc(widget.groupChatId)
               .collection(widget.groupChatId)
@@ -118,12 +119,30 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
             'type': 'text and image',
           });
 
+        await   FirebaseFirestore.instance
+            .collection('last_message')
+            .doc(user.uid)
+            .collection(user.uid).doc(currentUserId)
+            .set({
+            'text': _enteredMessage,
+            'timeSend': Timestamp.now(),
+            'username': userData['username'],
+            'userId2': peerId,
+            'userId1': currentUserId,
+            'userImage': userData['image_url'],
+            'isStats': userData['isStats'],
+            'type': 'text and image',});
+
+          setState(()  {
+            _isConnected = true;
+          });
+
           _controller.clear();
           setState(() {
             _enteredMessage = '';
           });
 
-        });
+
       }
     } on SocketException catch (err) {
       setState(() {
@@ -248,6 +267,18 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
                           widget.imageUrl.toString().isEmpty
                             ? null
                             : _sendMessage();
+
+                          setState(() async{
+                            await FirebaseFirestore.instance
+                                .collection('last_message')
+                                .doc()
+                                .collection(currentUserId).doc(currentUserId)
+                                .update({
+                              'text':_enteredMessage,
+                              'type':'text and image',
+                              'timeSend':Timestamp.now()
+                            });
+                          });
                           Navigator.of(context).pop();
 
 

@@ -141,64 +141,9 @@ class _ChatScreenState extends State<ChatScreen> {
                 )),
           ]),
           leadingWidth: 80,
-          // actions: [
-          // Container(
-          //     margin: EdgeInsets.only(right: 15, top:10),
-          //     child: IconButton(
-          //       icon: Icon(
-          //         Icons.call,
-          //         color: Theme.of(context).primaryIconTheme.color,
-          //         size: 27,
-          //       ), onPressed: () =>VoiceCallWidget(),),),
-          //         Container(
-          //             margin: EdgeInsets.only(right: 15, top:10),
-          //             child: IconButton(
-          //               icon: Icon(
-          //                 Icons.videocam_rounded,
-          //                 color: Theme.of(context).primaryIconTheme.color,
-          //                 size: 27,
-          //               ), onPressed: ()  =>VoiceCallWidget(),)),
-          // ],
+
         ),
-        //      actions: [
-        //   Container(
-        //     margin: EdgeInsets.only(right: 15, top:10),
-        //     child: DropdownButton(
-        //       underline: Container(),
-        //       icon: Icon(
-        //         Icons.more_vert,
-        //         color: Theme.of(context).primaryIconTheme.color,
-        //         size: 27,
-        //       ),
-        //       items: [
-        //         DropdownMenuItem(
-        //           value: 'logout',
-        //           child: Row(
-        //             children:  [
-        //               Icon(Icons.exit_to_app,color: Colors.black),
-        //               SizedBox(
-        //                 width: 8,
-        //               ),
-        //               Text('Logout'),
-        //             ],
-        //           ),
-        //         )
-        //       ],
-        //       onChanged: (itemIdentifier) {
-        //         if (itemIdentifier == 'logout') {
-        //           FirebaseAuth.instance.signOut();
-        //
-        //               Navigator.of(context).push(
-        //                 MaterialPageRoute(
-        //                     builder: (context) =>  AuthScreen()),
-        //               );
-        //
-        //           }
-        //
-        //       },
-        //     ),
-        //   ),
-        // ]
+
       ),
       body: Container(
         // height: MediaQuery.of(context).size.height,

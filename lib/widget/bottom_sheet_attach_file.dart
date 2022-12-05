@@ -105,28 +105,52 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
           'isStats': userData['isStats'],
           'type': type,
         });
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(peerId)
-            .update({
-          'lastMessage':null,
-          'timeSend':Timestamp.now()
+
+        await FirebaseFirestore.instance
+            .collection('last_message')
+            .doc(user.uid)
+            .collection(user.uid).doc(currentUserId)
+            .set({
+          'text': url,
+          'timeSend': Timestamp.now(),
+          'username': userData['username'],
+          'userId2': peerId,
+          'userId1': currentUserId,
+          'userImage': userData['image_url'],
+          'isStats': userData['isStats'],
+          'type': type,});
+
+        setState(() async{
+
+          await FirebaseFirestore.instance
+              .collection('last_message')
+              .doc(currentUserId)
+              .collection(currentUserId).doc(currentUserId)
+              .update({
+            'text':url,
+            'type':type,
+            'timeSend':Timestamp.now()
+          });
         });
 
+
+
+
+
         if (url != null && file != null) {
-          Fluttertoast.showToast(
+          await Fluttertoast.showToast(
             msg: "Done Uploaded",
             textColor: Colors.red,
           );
         } else {
-          Fluttertoast.showToast(
+          await Fluttertoast.showToast(
             msg: "Something went wrong",
             textColor: Colors.red,
           );
         }
       }
     } on Exception catch (e) {
-      Fluttertoast.showToast(
+      await Fluttertoast.showToast(
         msg: e.toString(),
         textColor: Colors.red,
       );
@@ -311,6 +335,7 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
                   InkWell(
                     onTap: () async {
                       await getMp3();
+
                     },
                     child: Column(
                       children: const [
