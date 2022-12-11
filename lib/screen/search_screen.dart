@@ -107,8 +107,8 @@ class _SearchScreenState extends State<SearchScreen>
   Widget build(BuildContext context) {
     final Stream<QuerySnapshot> _usersStream = FirebaseFirestore.instance
         .collection('users')
-        .where('username', isEqualTo: _enteredMessage.trim())
-        // .where('username', arrayContainsAny:[_enteredMessage.toLowerCase()])
+        .where('username', isGreaterThanOrEqualTo: _enteredMessage.trim())
+        // .where('username', arrayContains:[_enteredMessage])
         .snapshots();
 
     return Scaffold(
@@ -153,7 +153,7 @@ class _SearchScreenState extends State<SearchScreen>
     side: BorderSide(width: 1, color: Colors.grey)),
     child: Container(
     width: MediaQuery.of(context).size.width * 0.93,
-    height: MediaQuery.of(context).size.height * 0.7,
+    height: MediaQuery.of(context).size.height * 0.72,
 
     child:
         StreamBuilder(
@@ -173,161 +173,164 @@ class _SearchScreenState extends State<SearchScreen>
           return  ListView.builder(
                 itemCount: snapshot.data!.docs.length,
                 itemBuilder: (ctx, index) {
-                  return ListTile(
-                      leading: Stack(
-                        children: [
-                          CircleAvatar(
-                            radius: 25,
-                            backgroundImage:
-                            NetworkImage(
-                                documents[
-                                index]
-                                [
-                                'image_url']),
-                          ),
-                          Positioned(
-                              top: 35,
-                              left: 33,
-                              child: CircleAvatar(
-                                radius: 7,
-                                backgroundColor: documents[
-                                index]
-                                [
-                                'isStats']
-                                    ? Colors
-                                    .green
-                                    : Colors
-                                    .green
-                                    .withAlpha(
-                                    0),
-                              )),
-                        ],
-                      ),
-                      title: Text(
-                        documents[index]
-                        ['username'],
-                        style: TextStyle(
-                            color: Colors
-                                .black,
-                            fontWeight:
-                            FontWeight.bold,
-                            fontSize: 15),
-                      ),
-                      subtitle: documents[index][
-                      'lastMessage'] !=
-                          null
-                          ? Container(
-                        child: documents[
-                        index]
-                        [
-                        'lastMessage'] !=
-                            null
-                            ? Text(
-                          documents[
-                          index]
-                          [
-                          'lastMessage'],
+                  return Container(
+                    margin: EdgeInsets.only(top: 10),
+                    child: ListTile(
+                        leading: Stack(
+                          children: [
+                            CircleAvatar(
+                              radius: 25,
+                              backgroundImage:
+                              NetworkImage(
+                                  documents[
+                                  index]
+                                  [
+                                  'image_url']),
+                            ),
+                            Positioned(
+                                top: 35,
+                                left: 33,
+                                child: CircleAvatar(
+                                  radius: 7,
+                                  backgroundColor: documents[
+                                  index]
+                                  [
+                                  'isStats']
+                                      ? Colors
+                                      .green
+                                      : Colors
+                                      .green
+                                      .withAlpha(
+                                      0),
+                                )),
+                          ],
+                        ),
+                        title: Text(
+                          documents[index]
+                          ['username'],
                           style: TextStyle(
                               color: Colors
-                                  .black87,
-                              wordSpacing:
-                              1.5,
-                              letterSpacing:
-                              0.2,
+                                  .black,
                               fontWeight:
-                              FontWeight
-                                  .normal,
-                              fontSize:
-                              14),
-                        )
-                            : Text(
-                          'file 📁 ',
-                          style: TextStyle(
-                              color: Colors
-                                  .black87,
-                              wordSpacing:
-                              1.5,
-                              letterSpacing:
-                              0.2,
-                              fontWeight:
-                              FontWeight
-                                  .normal,
-                              fontSize:
-                              14),
+                              FontWeight.bold,
+                              fontSize: 15),
                         ),
-                      )
-                          : Container(
-                          child: Text(
-                            'send a first message',
-                            style: TextStyle(
-                                color: Colors
-                                    .black87,
-                                wordSpacing:
-                                1.5,
-                                letterSpacing:
-                                0.2,
-                                fontWeight:
-                                FontWeight
-                                    .normal,
-                                fontSize: 14),
-                          )),
+                        // subtitle: documents[index][
+                        // 'lastMessage'] !=
+                        //     null
+                        //     ? Container(
+                        //   child: documents[
+                        //   index]
+                        //   [
+                        //   'lastMessage'] !=
+                        //       null
+                        //       ? Text(
+                        //     documents[
+                        //     index]
+                        //     [
+                        //     'lastMessage'],
+                        //     style: TextStyle(
+                        //         color: Colors
+                        //             .black87,
+                        //         wordSpacing:
+                        //         1.5,
+                        //         letterSpacing:
+                        //         0.2,
+                        //         fontWeight:
+                        //         FontWeight
+                        //             .normal,
+                        //         fontSize:
+                        //         14),
+                        //   )
+                        //       : Text(
+                        //     'file 📁 ',
+                        //     style: TextStyle(
+                        //         color: Colors
+                        //             .black87,
+                        //         wordSpacing:
+                        //         1.5,
+                        //         letterSpacing:
+                        //         0.2,
+                        //         fontWeight:
+                        //         FontWeight
+                        //             .normal,
+                        //         fontSize:
+                        //         14),
+                        //   ),
+                        // )
+                        //     : Container(
+                        //     child: Text(
+                        //       'send a first message',
+                        //       style: TextStyle(
+                        //           color: Colors
+                        //               .black87,
+                        //           wordSpacing:
+                        //           1.5,
+                        //           letterSpacing:
+                        //           0.2,
+                        //           fontWeight:
+                        //           FontWeight
+                        //               .normal,
+                        //           fontSize: 14),
+                        //     )),
+                        //
+                        // trailing: documents[index]
+                        // ['timeSend'] !=
+                        //     null
+                        //     ? Container(
+                        //   child: Text(
+                        //     DateFormat(
+                        //         "h:mm a")
+                        //         .format(
+                        //         documents[
+                        //         index]
+                        //         [
+                        //         'timeSend']
+                        //             .toDate()),
+                        //     style: const TextStyle(
+                        //         color: Colors
+                        //             .black87,
+                        //         fontSize: 11),
+                        //   ),
+                        // )
+                        //     : Container(
+                        //   child: Text(
+                        //     DateFormat(
+                        //         "h:mm a")
+                        //         .format(DateTime
+                        //         .now()),
+                        //     style: const TextStyle(
+                        //         color: Colors
+                        //             .black87,
+                        //         fontSize: 11),
+                        //   ),
+                        // ),
+                        onTap: () async {
+                          await Navigator.of(
+                              context)
+                              .push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ChatScreen(
+                                        documents[index]
+                                        [
+                                        'username'],
+                                        documents[index]
+                                        [
+                                        'image_url'],
+                                        documents[index]
+                                        ['userId'],
+                                        currentUserId,
+                                        documents[index]
+                                        [
+                                        'isStats']),
+                              ));
 
-                      trailing: documents[index]
-                      ['timeSend'] !=
-                          null
-                          ? Container(
-                        child: Text(
-                          DateFormat(
-                              "h:mm a")
-                              .format(
-                              documents[
-                              index]
-                              [
-                              'timeSend']
-                                  .toDate()),
-                          style: const TextStyle(
-                              color: Colors
-                                  .black87,
-                              fontSize: 11),
-                        ),
-                      )
-                          : Container(
-                        child: Text(
-                          DateFormat(
-                              "h:mm a")
-                              .format(DateTime
-                              .now()),
-                          style: const TextStyle(
-                              color: Colors
-                                  .black87,
-                              fontSize: 11),
-                        ),
-                      ),
-                      onTap: () async {
-                        await Navigator.of(
-                            context)
-                            .push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  ChatScreen(
-                                      documents[index]
-                                      [
-                                      'username'],
-                                      documents[index]
-                                      [
-                                      'image_url'],
-                                      documents[index]
-                                      ['userId'],
-                                      currentUserId,
-                                      documents[index]
-                                      [
-                                      'isStats']),
-                            ));
 
+                          // Divider(height: 0.02,color: Colors.grey),
 
-                        // Divider(height: 0.02,color: Colors.grey),
-
-                      });
+                        }),
+                  );
                 });}
     )) )
     )

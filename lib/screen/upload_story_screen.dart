@@ -48,6 +48,7 @@ class _UploadStoryScreenState extends State<UploadStoryScreen>{
               .collection('stories')
               .doc(currentUserId)
               .set({
+            'id': DateTime.now().millisecondsSinceEpoch.toString(),
             'imageUrl': url,
             'createdAt': Timestamp.now(),
             'username': userData['username'],

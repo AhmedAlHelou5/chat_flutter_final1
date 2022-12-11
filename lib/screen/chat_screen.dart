@@ -34,6 +34,7 @@ class _ChatScreenState extends State<ChatScreen> {
   var currentUserId = FirebaseAuth.instance.currentUser!.uid;
   String groupChatId = "";
   bool emojiShowing = false;
+  final _scrollController = ScrollController();
 
   void SetStatus(bool status) {
     FirebaseFirestore.instance.collection('users').doc(currentUserId).update({
@@ -141,9 +142,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 )),
           ]),
           leadingWidth: 80,
-
         ),
-
       ),
       body: Container(
         // height: MediaQuery.of(context).size.height,
@@ -157,6 +156,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             NewMessage(widget.username, widget.image, widget.userId2,
                 chatRoomId, widget.isState),
+
           ],
         ),
       ),

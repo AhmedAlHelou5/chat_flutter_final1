@@ -72,6 +72,8 @@ dependencies:
   advstory: ^0.2.1
   flutter_story_list: ^1.0.4+2
   story_view: ^0.14.0
+  flutter_reaction_button: ^2.0.1+2
+  swipe_to: ^1.0.2
 
 
 dev_dependencies:

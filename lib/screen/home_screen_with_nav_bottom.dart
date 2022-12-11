@@ -14,7 +14,8 @@ class HomeScreenWithNavBottom extends StatefulWidget {
 }
 class _HomeScreenWithNavBottomState extends State<HomeScreenWithNavBottom> {
   int currentPage = 0;
-
+   String? groupChatId='';
+   String? userId2='';
   GlobalKey bottomNavigationKey = GlobalKey();
 
   @override

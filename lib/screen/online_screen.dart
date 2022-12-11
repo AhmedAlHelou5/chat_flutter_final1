@@ -98,43 +98,83 @@ class _OnlineScreenState extends State<OnlineScreen>
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: PreferredSize(
-        //wrap with PreferredSize
-        preferredSize: Size.fromHeight(55),
-    child: AppBar(
-    elevation: 4,
-    title: Text('Online'),
-    centerTitle: true,
+          //wrap with PreferredSize
+          preferredSize: Size.fromHeight(55),
+          child: AppBar(
+              elevation: 3,
+              title: Text('Online'),
+              centerTitle: true,
 
-    ),),
+              actions: [
+                Container(
+                  margin: EdgeInsets.only(right: 15),
+                  child: DropdownButton(
+                    underline: Container(),
+                    icon: Icon(Icons.menu,
+                        color: Theme
+                            .of(context)
+                            .primaryIconTheme
+                            .color,
+                        size: 27),
+                    items: [
+                      DropdownMenuItem(
+                        value: 'logout',
+                        child: Row(
+                          children: const [
+                            Icon(
+                              Icons.exit_to_app,
+                              color: Colors.black,
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text('Logout'),
+                          ],
+                        ),
+                      )
+                    ],
+                    onChanged: (itemIdentifier) async {
+                      if (itemIdentifier == 'logout') {
+                        SetStatus(false);
+                        await FirebaseAuth.instance.signOut();
+                      }
+                    },
+                  ),
+                ),
+              ]),
+        ),
+
       body: Column(
       children:[
-      Expanded(
-        flex: 5,
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.99,
+        Expanded(
+          flex: 5,
           child: Card(
             elevation: 3,
-            shape: BeveledRectangleBorder(
-                side: BorderSide(width: 1, color: Colors.grey)),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                    margin: EdgeInsets.only(left: 25, top: 15),
-                    child: Text(
-                      'Online',
-                      style: TextStyle(
+                  margin: EdgeInsets.only(top: 10, left: 20),
+                  child: Text(
+                    'Online',
+                    style: TextStyle(
                         color: Colors.pink,
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    )),
+                        fontSize: 20),
+                  ),
+                ),
                 Container(
-                    height: MediaQuery.of(context).size.height * 0.6,
-                    margin: EdgeInsets.only(top: 15, right: 10, left: 10),
-                    child:  StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection('users').where('isStats',isEqualTo: true)
+                    height: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.5,
+                    margin: EdgeInsets.only(
+                        top: 15, right: 10, left: 10),
+                    width: double.infinity,
+                    child: StreamBuilder(
+                        stream:  FirebaseFirestore.instance
+                            .collection('last_message')
+                            .where('userId1', isEqualTo: currentUserId)
                             .snapshots(),
                         builder: (context, AsyncSnapshot snapshot) {
                           if (snapshot.connectionState ==
@@ -144,191 +184,111 @@ class _OnlineScreenState extends State<OnlineScreen>
                             );
                           }
                           final documents = snapshot.data!.docs;
-
-
-
                           print('messages ${documents.length}');
-                          return documents.length >1 ? ListView.builder(
+                          return ListView.builder(
                               scrollDirection: Axis.vertical,
                               itemCount: documents.length,
                               itemBuilder: (ctx, index) {
                                 // var isStats = documents[index]['isStats'];
+
                                 return Column(
                                   children: [
                                     Container(
-                                      child: currentUserId !=
-                                          documents[index]['userId']
-                                          ? ListTile(
-                                          leading: Stack(
-                                            children: [
-                                              CircleAvatar(
-                                                radius: 25,
-                                                backgroundImage:
-                                                NetworkImage(
-                                                    documents[
-                                                    index]
-                                                    [
-                                                    'image_url']),
-                                              ),
-                                              Positioned(
-                                                  top: 35,
-                                                  left: 33,
-                                                  child: CircleAvatar(
-                                                    radius: 7,
-                                                    backgroundColor: documents[
-                                                    index]
-                                                    [
-                                                    'isStats']
-                                                        ? Colors.green
-                                                        : Colors.green
-                                                        .withAlpha(
-                                                        0),
-                                                  )),
-                                            ],
-                                          ),
-                                          title: Text(
-                                            documents[index]
-                                            ['username'],
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontWeight:
-                                                FontWeight.bold,
-                                                fontSize: 15),
-                                          ),
-                                          subtitle: documents[index][
-                                          'lastMessage'] !=
-                                              null
-                                              ? Container(
-                                            child: documents[
-                                            index]
-                                            [
-                                            'lastMessage'] !=
-                                                null
-                                                ? Text(
-                                              documents[
-                                              index]
-                                              [
-                                              'lastMessage'],
-                                              style: TextStyle(
-                                                  color: Colors
-                                                      .black87,
-                                                  wordSpacing:
-                                                  1.5,
-                                                  letterSpacing:
-                                                  0.2,
-                                                  fontWeight:
-                                                  FontWeight
-                                                      .normal,
-                                                  fontSize:
-                                                  14),
-                                            )
-                                                : Text(
-                                              'file 📁 ',
-                                              style: TextStyle(
-                                                  color: Colors
-                                                      .black87,
-                                                  wordSpacing:
-                                                  1.5,
-                                                  letterSpacing:
-                                                  0.2,
-                                                  fontWeight:
-                                                  FontWeight
-                                                      .normal,
-                                                  fontSize:
-                                                  14),
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets
+                                            .all(5),
+                                        leading: Stack(
+                                          children: [
+                                            CircleAvatar(
+                                              radius: 25,
+                                              backgroundImage:
+                                              NetworkImage(
+                                                  documents[index]
+                                                  ['userImage']),
                                             ),
-                                          )
-                                              : Container(
-                                              child: Text(
-                                                'send a first message',
-                                                style: TextStyle(
-                                                    color: Colors
-                                                        .black87,
-                                                    wordSpacing:
-                                                    1.5,
-                                                    letterSpacing:
-                                                    0.2,
-                                                    fontWeight:
-                                                    FontWeight
-                                                        .normal,
-                                                    fontSize: 14),
-                                              )),
-                                          //
-                                          // Container(
-                                          //   margin: EdgeInsets.only(top: 5),
-                                          //   child: Text(
-                                          //     documents[index]['username'],
-                                          //     style: TextStyle(
-                                          //         color: Colors.black,
-                                          //         fontWeight: FontWeight.normal,fontSize: 13),
-                                          //   ),
-                                          // ),
-                                          trailing: documents[index]
-                                          ['timeSend'] !=
-                                              null
-                                              ? Container(
-                                            child: Text(
-                                              DateFormat(
-                                                  "h:mm a")
-                                                  .format(documents[
-                                              index]
-                                              [
-                                              'timeSend']
+                                            Positioned(
+                                                top: 35,
+                                                left: 33,
+                                                child: CircleAvatar(
+                                                  radius: 7,
+                                                  backgroundColor:
+                                                  documents[index]
+                                                  ['isStats']
+                                                      ? Colors.green
+                                                      : Colors.green
+                                                      .withAlpha(
+                                                      0),
+                                                )),
+                                          ],
+                                        ),
+                                        title: Text(
+                                          documents[index]['username'],
+                                          style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight:
+                                              FontWeight.normal,
+                                              fontSize: 15),
+                                        ),
+                                        subtitle: Column(
+                                          children: [
+                                            if (documents[index]['type'] == 'Image')
+                                              Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('Photo',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.photo,size: 15)],),
+                                            if (documents[index]['type'] == 'mp3')
+                                              Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('File Music',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.music_video_rounded,size: 15)],),
+                                            if (documents[index]['type'] == 'file')
+                                              Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('File Pdf',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.picture_as_pdf,size: 15,)],),
+                                            if (documents[index]['type'] == 'voice')
+                                              Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('Voice',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.keyboard_voice_sharp,size: 15,)],),
+                                            if (documents[index]['type'] == 'text and image')
+                                              Row(mainAxisAlignment:MainAxisAlignment.start,children: [ Text(documents[index]['text']=="" ? 'Photo':documents[index]['text']),Icon(Icons.photo,size: 15,)],),
+                                            if (documents[index]['type'] == 'text')
+                                              Row(mainAxisAlignment:MainAxisAlignment.start,
+                                                children: [
+                                                  Text(documents[index]['text'],style: TextStyle(color: Colors.black87,fontSize: 13),),
+                                                ],
+                                              )
+                                          ],
+                                        )
+
+                                        ,
+                                        trailing: Text(
+                                          DateFormat("h:mm a").format(
+                                              documents[index]['timeSend']
                                                   .toDate()),
-                                              style: const TextStyle(
-                                                  color: Colors
-                                                      .black87,
-                                                  fontSize: 11),
-                                            ),
-                                          )
-                                              : Container(
-                                            child: Text(
-                                              DateFormat(
-                                                  "h:mm a")
-                                                  .format(DateTime
-                                                  .now()),
-                                              style: const TextStyle(
-                                                  color: Colors
-                                                      .black87,
-                                                  fontSize: 11),
-                                            ),
-                                          ),
-                                          onTap: () async {
-                                            await Navigator.of(
-                                                context)
-                                                .push(
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      ChatScreen(
-                                                          documents[index]
-                                                          [
-                                                          'username'],
-                                                          documents[index]
-                                                          [
-                                                          'image_url'],
-                                                          documents[index]
-                                                          ['userId'],
-                                                          currentUserId,
-                                                          documents[index]
-                                                          [
-                                                          'isStats']),
-                                                ));
-                                          })
-                                          : Container(), //                           <-- Divider
+                                          style: TextStyle(
+                                              color: Colors.black87,
+                                              fontSize: 10),
+                                        ),
+                                        onTap: () async {
+                                          await Navigator.of(context)
+                                              .push(MaterialPageRoute(
+                                            builder: (context) =>
+                                                ChatScreen(
+                                                    documents[index]
+                                                    ['username'],
+                                                    documents[index]
+                                                    ['userImage'],
+                                                    documents[index]
+                                                    ['userId1'],
+                                                    currentUserId,
+                                                    documents[index]
+                                                    ['isStats']),
+                                          ));
+                                        },
+                                      ), //                           <-- Divider
                                     ),
+                                    // Divider(),
+
                                     // Divider(height: 0.02,color: Colors.grey),
                                   ],
                                 );
-                              }): Container(
-                              child: Image.asset('assets/images/b.jpg',
-                                width: MediaQuery.of(context).size.width,height: 200,fit: BoxFit.cover,));
-                          ;
+                              });
                         })),
               ],
             ),
           ),
         ),
-      ),
+
       ])
     );
   }

@@ -25,61 +25,6 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
   String? _enteredMessage = '';
 
   bool? _isConnected;
-
-
-  // void _sendMessage() async {
-  //   final user = FirebaseAuth.instance.currentUser!;
-  //   final userData = await FirebaseFirestore.instance
-  //       .collection('users')
-  //       .doc(user.uid)
-  //       .get();
-  //   var currentUserId = user.uid;
-  //   var peerId = widget.userId2;
-  //
-  //   try {
-  //     final response = await InternetAddress.lookup('www.google.com');
-  //     if (response.isNotEmpty) {
-  //       setState(() {
-  //         _isConnected = true;
-  //         FirebaseFirestore.instance
-  //             .collection('messages')
-  //             .doc(widget.groupChatId)
-  //             .collection(widget.groupChatId)
-  //             .add({
-  //           'text': _enteredMessage,
-  //           'imageUrl': null,
-  //           'file': null,
-  //           'createdAt': Timestamp.now(),
-  //           'username': userData['username'],
-  //           'userId2': peerId,
-  //           'userId1': currentUserId,
-  //           'userImage': userData['image_url'],
-  //           'isStats': userData['isStats'],
-  //           'type': 'text',
-  //         });
-  //         _controller.clear();
-  //         setState(() {
-  //           _enteredMessage = '';
-  //         });
-  //       });
-  //     }
-  //   } on SocketException catch (err) {
-  //     setState(() {
-  //       _isConnected = false;
-  //       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Don’t Send because No Internet connection')));
-  //
-  //     });
-  //     if (kDebugMode) {
-  //       print(err);
-  //     }
-  //   }
-  //
-  //
-  // }
-
-
-
-
   void _sendMessage() async {
     final user = FirebaseAuth.instance.currentUser!;
     final userData = await FirebaseFirestore.instance
@@ -107,7 +52,8 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
               .doc(widget.groupChatId)
               .collection(widget.groupChatId)
               .add({
-            'text': _enteredMessage ,
+          'id': DateTime.now().millisecondsSinceEpoch.toString(),
+          'text': _enteredMessage ,
             'imageUrl': url,
             'file': null,
             'createdAt': Timestamp.now(),
@@ -122,7 +68,8 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
         await   FirebaseFirestore.instance
             .collection('last_message')
             .doc(user.uid)
-            .collection(user.uid).doc(currentUserId)
+            .collection(currentUserId).doc(widget.userId2)
+
             .set({
             'text': _enteredMessage,
             'timeSend': Timestamp.now(),
@@ -267,19 +214,20 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
                           widget.imageUrl.toString().isEmpty
                             ? null
                             : _sendMessage();
+                          Navigator.of(context).pop();
 
                           setState(() async{
                             await FirebaseFirestore.instance
                                 .collection('last_message')
                                 .doc()
-                                .collection(currentUserId).doc(currentUserId)
+                                .collection(currentUserId).doc(widget.userId2)
                                 .update({
                               'text':_enteredMessage,
                               'type':'text and image',
                               'timeSend':Timestamp.now()
                             });
+
                           });
-                          Navigator.of(context).pop();
 
 
                         },

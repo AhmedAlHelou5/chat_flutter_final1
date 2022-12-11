@@ -94,6 +94,7 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
             .doc(widget.groupChatId)
             .collection(widget.groupChatId)
             .add({
+          'id': DateTime.now().millisecondsSinceEpoch.toString(),
           'text': null,
           'file': url,
           'createdAt': Timestamp.now(),
@@ -109,7 +110,7 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
         await FirebaseFirestore.instance
             .collection('last_message')
             .doc(user.uid)
-            .collection(user.uid).doc(currentUserId)
+            .collection(currentUserId).doc(widget.userId2)
             .set({
           'text': url,
           'timeSend': Timestamp.now(),
@@ -125,7 +126,7 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
           await FirebaseFirestore.instance
               .collection('last_message')
               .doc(currentUserId)
-              .collection(currentUserId).doc(currentUserId)
+              .collection('${currentUserId}-${widget.userId2}').doc('${currentUserId}-${widget.userId2}')
               .update({
             'text':url,
             'type':type,

@@ -21,11 +21,8 @@ class Message extends StatefulWidget {
 
 class _MessageState extends State<Message> {
   final currentUser = FirebaseAuth.instance.currentUser!;
-
+    final _scrollController=ScrollController();
   var currentUserId=FirebaseAuth.instance.currentUser!.uid ;
-
-
-  // final chat=  FirebaseFirestore.instance.collection('chat').doc(FirebaseAuth.instance.currentUser!.uid)
   @override
   Widget build(BuildContext context) {
 
@@ -73,11 +70,12 @@ class _MessageState extends State<Message> {
 
         return ListView.builder(
           reverse: true,
+          shrinkWrap: true,
+          controller: _scrollController,
           itemCount: snapshot.data!.docs.length,
+
           itemBuilder: (ctx, index) {
               return chat[index];
-
-
 
           }
         );

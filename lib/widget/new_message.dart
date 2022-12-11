@@ -38,15 +38,6 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
   final _auth = FirebaseAuth.instance;
   late User signedInUser;
 
-  // void SetLastMessage(bool me,String lastMessage) {
-  //   FirebaseFirestore.instance
-  //       .collection('users')
-  //       .doc(_auth.currentUser!.uid)
-  //       .update({
-  //     'isMe': me,
-  //     'lastMessage':lastMessage,
-  //   });
-  // }
 
 
   void getCurrentUser() {
@@ -76,8 +67,12 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
         .collection('users')
         .doc(user.uid)
         .get();
+    final userDataLastMessage = await FirebaseFirestore.instance
+        .collection('users').doc(widget.userId2)
+        .get();
     var currentUserId = user.uid;
     var peerId = widget.userId2;
+    var index=0;
 
     try {
       final response = await InternetAddress.lookup('www.google.com');
@@ -89,6 +84,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
               .doc(widget.groupChatId)
               .collection(widget.groupChatId)
               .add({
+            'id': DateTime.now().millisecondsSinceEpoch.toString(),
             'text': _enteredMessage,
             'imageUrl': null,
             'file': null,
@@ -100,27 +96,19 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'isStats': userData['isStats'],
             'type': 'text',
           });
-          // FirebaseFirestore.instance
-          //     .collection('users')
-          //     .doc(peerId)
-          //     .update({
-          // 'lastMessage':_enteredMessage,
-          //   'timeSend':Timestamp.now()
-          //
-          // });
+
 
           FirebaseFirestore.instance
               .collection('last_message')
-              .doc(user.uid)
-              .collection(user.uid).doc(signedInUser.uid)
+              .doc(peerId)
               .set({
             'text': _enteredMessage,
             'timeSend': Timestamp.now(),
-            'username': userData['username'],
+            'username': userDataLastMessage['username'],
             'userId2': peerId,
             'userId1': currentUserId,
-            'userImage': userData['image_url'],
-            'isStats': userData['isStats'],
+            'userImage': userDataLastMessage['image_url'],
+            'isStats': userDataLastMessage['isStats'],
             'type': 'text',});
 
 
@@ -170,6 +158,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
               .doc(widget.groupChatId)
               .collection(widget.groupChatId)
               .add({
+            'id': DateTime.now().millisecondsSinceEpoch.toString(),
             'text': null,
             'imageUrl': null,
             'file': url,
@@ -179,14 +168,14 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'userId1': currentUserId,
             'userImage': userData['image_url'],
             'isStats': userData['isStats'],
-            'type': 'mp3',
+            'type': 'voice',
           });
 
 
         await  FirebaseFirestore.instance
               .collection('last_message')
-              .doc(user.uid)
-              .collection(user.uid).doc(signedInUser.uid)
+              .doc('userId1-userId2')
+            .collection('userId1-userId2').doc('userId1-userId2')
               .set({
             'text': url,
             'timeSend': Timestamp.now(),
@@ -216,6 +205,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
     }
   }
 
+  final _scrollController = ScrollController();
 
 
   @override
@@ -297,53 +287,55 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                 ),
               ),
               if( _enteredMessage.trim().isEmpty)
-                SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Container(
-                           margin: EdgeInsets.only(top: 15),
-                           child: SocialMediaRecorder(
-                            sendRequestFunction: (soundFile)async {
-                              print("the current path is ${soundFile.path}");
-                              _sendMessageVoice(soundFile);
+                Padding(
+                  padding: const EdgeInsets.only(top: 10, left: 4, right: 4),
+                  child: Align(
+                      alignment: Alignment.centerRight,
+                             child: SocialMediaRecorder(
+                              sendRequestFunction: (soundFile)async {
+                                print("the current path is ${soundFile.path}");
+                                _sendMessageVoice(soundFile);
 
-                                setState(() async{
+                                  setState(() async{
 
-                                      var imagefile = FirebaseStorage.instance.ref('ChatRoom').child(
-                                      '/file ${widget.groupChatId}').child("/${widget.username}");
-                                      UploadTask task = imagefile.putFile(soundFile);
-                                      TaskSnapshot snapshot = await task;
-                                    String  url = await snapshot.ref.getDownloadURL();
+                                        var imagefile = FirebaseStorage.instance.ref('ChatRoom').child(
+                                        '/file ${widget.groupChatId}').child("/${widget.username}");
+                                        UploadTask task = imagefile.putFile(soundFile);
+                                        TaskSnapshot snapshot = await task;
+                                      String  url = await snapshot.ref.getDownloadURL();
 
-                                  await FirebaseFirestore.instance
-                                      .collection('last_message')
-                                      .doc(signedInUser.uid)
-                                      .collection(signedInUser.uid).doc(signedInUser.uid)
-                                      .update({
-                                    'text':url,
-                                    'type':'voice',
-                                    'timeSend':Timestamp.now()
+                                    await FirebaseFirestore.instance
+                                        .collection('last_message')
+                                        .doc(signedInUser.uid)
+                                        .collection(signedInUser.uid).doc(widget.userId2)
+                                        .update({
+                                      'text':url,
+                                      'type':'voice',
+                                      'timeSend':Timestamp.now()
+                                    });
                                   });
-                                });
 
 
-                            },
+                              },
 
-                             encode: AudioEncoderType.AAC,
-                             recordIcon: Icon(Icons.mic_rounded,color: Colors.pink,),
-                             cancelTextBackGroundColor: Colors.red,
-                             backGroundColor:Colors.white,
-                             counterTextStyle: TextStyle(color: Colors.pink),
-                             recordIconBackGroundColor: Colors.white,
-                             sendButtonIcon: Icon(Icons.send,color: Colors.white,textDirection: TextDirection.ltr),
-                             recordIconWhenLockBackGroundColor: Colors.pink,
-
-
+                               encode: AudioEncoderType.AAC,
+                               recordIcon: Icon(Icons.mic_rounded,color: Colors.pink,),
+                               cancelTextBackGroundColor: Colors.red,
+                               backGroundColor:Colors.white,
+                               counterTextStyle: TextStyle(color: Colors.pink),
+                               recordIconBackGroundColor: Colors.white,
+                               sendButtonIcon: Icon(Icons.send,color: Colors.white,textDirection: TextDirection.ltr),
+                               recordIconWhenLockBackGroundColor: Colors.pink,
 
 
 
-                       ),
-                  ),
+
+
+
+                         ),
+                    ),
                 ),
+
 
               // IconButton(
               //     color: Theme.of(context).primaryColor,
@@ -356,11 +348,15 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                   color: Theme.of(context).primaryColor,
                   onPressed:  () {
                     _sendMessage();
+                    _scrollController.animateTo(
+                        _scrollController.position.maxScrollExtent,
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeInOut);
                     setState(() async {
                      await FirebaseFirestore.instance
                           .collection('last_message')
                           .doc(signedInUser.uid)
-                          .collection(signedInUser.uid).doc(signedInUser.uid)
+                         .collection(signedInUser.uid).doc(widget.userId2)
                           .update({
                         'text':_enteredMessage,
                         'timeSend':Timestamp.now()
