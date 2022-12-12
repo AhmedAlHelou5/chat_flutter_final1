@@ -78,6 +78,9 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
           .collection('users')
           .doc(user.uid)
           .get();
+      final userDataLastMessage = await FirebaseFirestore.instance
+          .collection('users').doc(widget.userId2)
+          .get();
       var currentUserId = user.uid;
       var peerId = widget.userId2;
       final response = await InternetAddress.lookup('www.google.com');
@@ -109,24 +112,23 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
 
         await FirebaseFirestore.instance
             .collection('last_message')
-            .doc(user.uid)
-            .collection(currentUserId).doc(widget.userId2)
+            .doc('$currentUserId-$peerId')
+
             .set({
           'text': url,
           'timeSend': Timestamp.now(),
-          'username': userData['username'],
+          'username': userDataLastMessage['username'],
           'userId2': peerId,
           'userId1': currentUserId,
-          'userImage': userData['image_url'],
-          'isStats': userData['isStats'],
+          'userImage': userDataLastMessage['image_url'],
+          'isStats': userDataLastMessage['isStats'],
           'type': type,});
 
         setState(() async{
 
           await FirebaseFirestore.instance
               .collection('last_message')
-              .doc(currentUserId)
-              .collection('${currentUserId}-${widget.userId2}').doc('${currentUserId}-${widget.userId2}')
+              .doc('$currentUserId-$peerId')
               .update({
             'text':url,
             'type':type,

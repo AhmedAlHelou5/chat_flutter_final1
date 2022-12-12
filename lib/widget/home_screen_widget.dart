@@ -125,6 +125,9 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   final stories = FirebaseFirestore.instance.collection('stories').snapshots();
   var indexx = 0;
   DateTime? currentBackPressTime;
+  final userDataLastMessage =  FirebaseFirestore.instance
+      .collection('last_message').doc()
+      .get();
 
   Future<bool> onWillPop() {
     DateTime now = DateTime.now();
@@ -307,7 +310,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                               child: StreamBuilder(
                                   stream: FirebaseFirestore.instance
                                       .collection('last_message')
-                                      .where('userId1', isEqualTo: currentUserId)
+                                  .where('userId1', isGreaterThanOrEqualTo: currentUserId)
                                       .snapshots(),
                                   builder: (context, AsyncSnapshot snapshot) {
                                     if (snapshot.connectionState ==
@@ -322,8 +325,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                         scrollDirection: Axis.vertical,
                                         itemCount: documents.length,
                                         itemBuilder: (ctx, index) {
-                                          var peerId =
-                                              documents[index]['userId2'];
+                                          var peerId = documents[index]['userId2'];
                                           FirebaseFirestore.instance
                                               .collection('users')
                                               .where('userId',
@@ -463,14 +465,8 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                               MainAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            Text(documents[index]
-                                                                        [
-                                                                        'text'] ==
-                                                                    ""
-                                                                ? 'Photo'
-                                                                : documents[
-                                                                        index]
-                                                                    ['text']),
+                                                            Text(documents[index]['text'] == ""? 'Photo' : documents[index]['text'],                                                              overflow: TextOverflow.ellipsis,
+                                                            ),
                                                             Icon(
                                                               Icons.photo,
                                                               size: 15,
@@ -485,13 +481,18 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                               MainAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            Text(
-                                                              documents[index]
-                                                                  ['text'],
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .black87,
-                                                                  fontSize: 13),
+                                                            Container(
+                                                              padding: EdgeInsets.only(right: 20),
+                                                              child: Text(
+                                                                documents[index]
+                                                                    ['text'],
+                                                                overflow: TextOverflow.ellipsis,
+
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .black87,
+                                                                    fontSize: 13),
+                                                              ),
                                                             ),
                                                           ],
                                                         )
@@ -516,7 +517,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                               documents[index]
                                                                   ['userImage'],
                                                               documents[index]
-                                                                  ['userId1'],
+                                                                  ['userId2'],
                                                               currentUserId,
                                                               documents[index]
                                                                   ['isStats']),

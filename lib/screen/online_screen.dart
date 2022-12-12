@@ -164,10 +164,7 @@ class _OnlineScreenState extends State<OnlineScreen>
                   ),
                 ),
                 Container(
-                    height: MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.5,
+                    height: MediaQuery.of(context).size.height * 0.7,
                     margin: EdgeInsets.only(
                         top: 15, right: 10, left: 10),
                     width: double.infinity,
@@ -184,14 +181,15 @@ class _OnlineScreenState extends State<OnlineScreen>
                             );
                           }
                           final documents = snapshot.data!.docs;
+                          var index =0;
                           print('messages ${documents.length}');
-                          return ListView.builder(
+                          return  documents[index]['isStats']==true? ListView.builder(
                               scrollDirection: Axis.vertical,
                               itemCount: documents.length,
                               itemBuilder: (ctx, index) {
                                 // var isStats = documents[index]['isStats'];
 
-                                return Column(
+                                return  documents[index]['isStats']==true? Column(
                                   children: [
                                     Container(
                                       child: ListTile(
@@ -269,20 +267,26 @@ class _OnlineScreenState extends State<OnlineScreen>
                                                     documents[index]
                                                     ['userImage'],
                                                     documents[index]
-                                                    ['userId1'],
+                                                    ['userId2'],
                                                     currentUserId,
                                                     documents[index]
                                                     ['isStats']),
                                           ));
                                         },
                                       ), //                           <-- Divider
-                                    ),
+                                    )
+                                    //     :Container(
+                                    //   child:Image(image: AssetImage('assets/images/b.jpg')),
+                                    // ),
                                     // Divider(),
 
                                     // Divider(height: 0.02,color: Colors.grey),
-                                  ],
-                                );
-                              });
+                                ],
+                                ):Container();
+                              })  :Container(
+                                child:Image(image: AssetImage('assets/images/b.jpg')),
+                              )
+                          ;
                         })),
               ],
             ),

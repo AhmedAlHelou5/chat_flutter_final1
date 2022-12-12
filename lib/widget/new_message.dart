@@ -100,7 +100,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
 
           FirebaseFirestore.instance
               .collection('last_message')
-              .doc(peerId)
+              .doc('$currentUserId-$peerId')
               .set({
             'text': _enteredMessage,
             'timeSend': Timestamp.now(),
@@ -139,6 +139,9 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
         .collection('users')
         .doc(user.uid)
         .get();
+    final userDataLastMessage = await FirebaseFirestore.instance
+        .collection('users').doc(widget.userId2)
+        .get();
     var currentUserId = user.uid;
     var peerId = widget.userId2;
 
@@ -174,16 +177,15 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
 
         await  FirebaseFirestore.instance
               .collection('last_message')
-              .doc('userId1-userId2')
-            .collection('userId1-userId2').doc('userId1-userId2')
-              .set({
+            .doc('$currentUserId-$peerId')
+            .set({
             'text': url,
             'timeSend': Timestamp.now(),
-            'username': userData['username'],
+            'username': userDataLastMessage['username'],
             'userId2': peerId,
             'userId1': currentUserId,
-            'userImage': userData['image_url'],
-            'isStats': userData['isStats'],
+            'userImage': userDataLastMessage['image_url'],
+            'isStats': userDataLastMessage['isStats'],
             'type': 'voice',});
 
 
@@ -306,8 +308,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
 
                                     await FirebaseFirestore.instance
                                         .collection('last_message')
-                                        .doc(signedInUser.uid)
-                                        .collection(signedInUser.uid).doc(widget.userId2)
+                                        .doc('${signedInUser.uid}-${widget.userId2}')
                                         .update({
                                       'text':url,
                                       'type':'voice',
