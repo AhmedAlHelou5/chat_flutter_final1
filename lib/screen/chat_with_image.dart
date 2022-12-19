@@ -78,7 +78,6 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
             'userId2': peerId,
             'userId1': currentUserId,
             'userImage': userDataLastMessage['image_url'],
-            'isStats': userDataLastMessage['isStats'],
             'type': 'text and image',});
 
           setState(()  {

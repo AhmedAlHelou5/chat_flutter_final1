@@ -1,3 +1,4 @@
+import 'package:chat_flutter_final/screen/add_story.dart';
 import 'package:flutter/material.dart';
 import 'package:story_view/controller/story_controller.dart';
 import 'package:story_view/widgets/story_view.dart';
@@ -125,19 +126,25 @@ class _MoreStoriesState extends State<MoreStories> {
 
         ]),
         leadingWidth: 150,
-        title: Row(
-          children: [
-            Container(
-              child: CircleAvatar(
-                radius: 20,
-                backgroundImage: NetworkImage(widget.imageUser!),
-              ),
-            ), Container(
-              margin: EdgeInsets.only(left: 7,top: 3),
-                child: FittedBox(fit: BoxFit.contain,child: Text(widget.username!,style: TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.bold),)),
-              ),
+        title: InkWell(
+          onTap:  () async {
+            await Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) =>AddStory()));
+          },
+          child: Row(
+            children: [
+              Container(
+                child: CircleAvatar(
+                  radius: 20,
+                  backgroundImage: NetworkImage(widget.imageUser!),
+                ),
+              ), Container(
+                margin: EdgeInsets.only(left: 7,top: 3),
+                  child: FittedBox(fit: BoxFit.contain,child: Text(widget.username!,style: TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.bold),)),
+                ),
 
-          ],
+            ],
+          ),
         ),
 
 

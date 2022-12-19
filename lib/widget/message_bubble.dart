@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:chat_flutter_final/widget/audio_player.dart';
 import 'package:chat_flutter_final/widget/file.dart';
-import 'package:chat_flutter_final/widget/message.dart';
 import 'package:chat_flutter_final/widget/text.dart';
 import 'package:chat_flutter_final/widget/text_with_image.dart';
 import 'package:flutter/services.dart';

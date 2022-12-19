@@ -149,6 +149,7 @@ class _OnlineScreenState extends State<OnlineScreen>
         Expanded(
           flex: 5,
           child: Card(
+            color: Theme.of(context).accentColor,
             elevation: 3,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,131 +164,135 @@ class _OnlineScreenState extends State<OnlineScreen>
                         fontSize: 20),
                   ),
                 ),
-                Container(
-                    height: MediaQuery.of(context).size.height * 0.7,
-                    margin: EdgeInsets.only(
-                        top: 15, right: 10, left: 10),
-                    width: double.infinity,
-                    child: StreamBuilder(
-                        stream:  FirebaseFirestore.instance
-                            .collection('last_message')
-                            .where('userId1', isEqualTo: currentUserId)
-                            .snapshots(),
-                        builder: (context, AsyncSnapshot snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-                          final documents = snapshot.data!.docs;
-                          var index =0;
-                          print('messages ${documents.length}');
-                          return  documents[index]['isStats']==true? ListView.builder(
-                              scrollDirection: Axis.vertical,
-                              itemCount: documents.length,
-                              itemBuilder: (ctx, index) {
-                                // var isStats = documents[index]['isStats'];
+                Card(
+                  elevation: 5,
+                  child: Container(
+                      height: MediaQuery.of(context).size.height * 0.75,
+                      margin: EdgeInsets.only(
+                          top: 15, right: 10, left: 10),
+                      width: double.infinity,
+                      child: StreamBuilder(
+                          stream:  FirebaseFirestore.instance
+                              .collection('users')
+                              .where('isStats',isEqualTo: true)
+                              .snapshots(),
+                          builder: (context, AsyncSnapshot snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            final documents = snapshot.data!.docs;
+                            var index =0;
+                            print('messages ${documents.length}');
+                            return  documents[index]['isStats']==true? ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                itemCount: documents.length,
+                                itemBuilder: (ctx, index) {
+                                  var isStats = documents[index]['isStats'];
+                                  var userId = documents[index]['userId'];
 
-                                return  documents[index]['isStats']==true? Column(
-                                  children: [
-                                    Container(
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets
-                                            .all(5),
-                                        leading: Stack(
-                                          children: [
-                                            CircleAvatar(
-                                              radius: 25,
-                                              backgroundImage:
-                                              NetworkImage(
-                                                  documents[index]
-                                                  ['userImage']),
-                                            ),
-                                            Positioned(
-                                                top: 35,
-                                                left: 33,
-                                                child: CircleAvatar(
-                                                  radius: 7,
-                                                  backgroundColor:
-                                                  documents[index]
-                                                  ['isStats']
-                                                      ? Colors.green
-                                                      : Colors.green
-                                                      .withAlpha(
-                                                      0),
-                                                )),
-                                          ],
-                                        ),
-                                        title: Text(
-                                          documents[index]['username'],
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontWeight:
-                                              FontWeight.normal,
-                                              fontSize: 15),
-                                        ),
-                                        subtitle: Column(
-                                          children: [
-                                            if (documents[index]['type'] == 'Image')
-                                              Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('Photo',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.photo,size: 15)],),
-                                            if (documents[index]['type'] == 'mp3')
-                                              Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('File Music',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.music_video_rounded,size: 15)],),
-                                            if (documents[index]['type'] == 'file')
-                                              Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('File Pdf',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.picture_as_pdf,size: 15,)],),
-                                            if (documents[index]['type'] == 'voice')
-                                              Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('Voice',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.keyboard_voice_sharp,size: 15,)],),
-                                            if (documents[index]['type'] == 'text and image')
-                                              Row(mainAxisAlignment:MainAxisAlignment.start,children: [ Text(documents[index]['text']=="" ? 'Photo':documents[index]['text']),Icon(Icons.photo,size: 15,)],),
-                                            if (documents[index]['type'] == 'text')
-                                              Row(mainAxisAlignment:MainAxisAlignment.start,
-                                                children: [
-                                                  Text(documents[index]['text'],style: TextStyle(color: Colors.black87,fontSize: 13),),
-                                                ],
-                                              )
-                                          ],
-                                        )
+                                  return   Column(
+                                    children: [
+                                      Container(
+                                        child: ListTile(
+                                          contentPadding: EdgeInsets
+                                              .all(5),
+                                          leading: Stack(
+                                            children: [
+                                              CircleAvatar(
+                                                radius: 25,
+                                                backgroundImage:
+                                                NetworkImage(
+                                                    documents[index]
+                                                    ['image_url']),
+                                              ),
+                                              Positioned(
+                                                  top: 35,
+                                                  left: 33,
+                                                  child: CircleAvatar(
+                                                    radius: 7,
+                                                    backgroundColor:
+                                                    documents[index]
+                                                    ['isStats']
+                                                        ? Colors.green
+                                                        : Colors.green
+                                                        .withAlpha(
+                                                        0),
+                                                  )),
+                                            ],
+                                          ),
+                                          title: Text(
+                                            documents[index]['username'],
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontWeight:
+                                                FontWeight.normal,
+                                                fontSize: 15),
+                                          ),
+                                          // subtitle: Column(
+                                          //   children: [
+                                          //     if (documents[index]['type'] == 'Image')
+                                          //       Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('Photo',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.photo,size: 15)],),
+                                          //     if (documents[index]['type'] == 'mp3')
+                                          //       Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('File Music',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.music_video_rounded,size: 15)],),
+                                          //     if (documents[index]['type'] == 'file')
+                                          //       Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('File Pdf',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.picture_as_pdf,size: 15,)],),
+                                          //     if (documents[index]['type'] == 'voice')
+                                          //       Row(mainAxisAlignment:MainAxisAlignment.start,children: [Text('Voice',style: TextStyle(color: Colors.black87,fontSize: 13)),Icon(Icons.keyboard_voice_sharp,size: 15,)],),
+                                          //     if (documents[index]['type'] == 'text and image')
+                                          //       Row(mainAxisAlignment:MainAxisAlignment.start,children: [ Text(documents[index]['text']=="" ? 'Photo':documents[index]['text']),Icon(Icons.photo,size: 15,)],),
+                                          //     if (documents[index]['type'] == 'text')
+                                          //       Row(mainAxisAlignment:MainAxisAlignment.start,
+                                          //         children: [
+                                          //           Text(documents[index]['text']??'Send First Message',style: TextStyle(color: Colors.black87,fontSize: 13),),
+                                          //         ],
+                                          //       )
+                                          //   ],
+                                          // ),
 
-                                        ,
-                                        trailing: Text(
-                                          DateFormat("h:mm a").format(
-                                              documents[index]['timeSend']
-                                                  .toDate()),
-                                          style: TextStyle(
-                                              color: Colors.black87,
-                                              fontSize: 10),
-                                        ),
-                                        onTap: () async {
-                                          await Navigator.of(context)
-                                              .push(MaterialPageRoute(
-                                            builder: (context) =>
-                                                ChatScreen(
-                                                    documents[index]
-                                                    ['username'],
-                                                    documents[index]
-                                                    ['userImage'],
-                                                    documents[index]
-                                                    ['userId2'],
-                                                    currentUserId,
-                                                    documents[index]
-                                                    ['isStats']),
-                                          ));
-                                        },
-                                      ), //                           <-- Divider
-                                    )
-                                    //     :Container(
-                                    //   child:Image(image: AssetImage('assets/images/b.jpg')),
-                                    // ),
-                                    // Divider(),
 
-                                    // Divider(height: 0.02,color: Colors.grey),
-                                ],
-                                ):Container();
-                              })  :Container(
-                                child:Image(image: AssetImage('assets/images/b.jpg')),
-                              )
-                          ;
-                        })),
+                                          // trailing: Text(
+                                          //   DateFormat("h:mm a").format(
+                                          //       documents[index]['timeSend']
+                                          //           .toDate()),
+                                          //   style: TextStyle(
+                                          //       color: Colors.black87,
+                                          //       fontSize: 10),
+                                          // ),
+                                          onTap: () async {
+                                            await Navigator.of(context)
+                                                .push(MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ChatScreen(
+                                                      documents[index]
+                                                      ['username'],
+                                                      documents[index]
+                                                      ['image_url'],
+                                                      documents[index]
+                                                      ['userId'],
+                                                      currentUserId,
+                                                      documents[index]
+                                                      ['isStats']),
+                                            ));
+                                          },
+                                        ), //                           <-- Divider
+                                      )
+                                      //     :Container(
+                                      //   child:Image(image: AssetImage('assets/images/b.jpg')),
+                                      // ),
+                                      // Divider(),
+
+                                      // Divider(height: 0.02,color: Colors.grey),
+                                  ],
+                                  );
+                                })  :Container(
+                                  child:Image(image: AssetImage('assets/images/b.jpg')),
+                                )
+                            ;
+                          })),
+                ),
               ],
             ),
           ),

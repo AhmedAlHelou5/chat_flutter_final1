@@ -122,12 +122,13 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   String groupChatId = "";
 
   final userData = FirebaseFirestore.instance.collection('users').snapshots();
+
+  // final isStats=userData[];
   final stories = FirebaseFirestore.instance.collection('stories').snapshots();
-  var indexx = 0;
+
   DateTime? currentBackPressTime;
-  final userDataLastMessage =  FirebaseFirestore.instance
-      .collection('last_message').doc()
-      .get();
+  final userDataLastMessage =
+      FirebaseFirestore.instance.collection('last_message').doc().get();
 
   Future<bool> onWillPop() {
     DateTime now = DateTime.now();
@@ -140,8 +141,13 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
     return Future.value(true);
   }
 
+
   @override
   Widget build(BuildContext context) {
+    final _lastMessage =FirebaseFirestore.instance
+        .collection('last_message')
+        .where('userId1', isEqualTo: currentUserId)
+        .snapshots();
     return Scaffold(
         appBar: PreferredSize(
           //wrap with PreferredSize
@@ -232,10 +238,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                   Theme.of(context).accentColor,
                               image: Icon(Icons.add_a_photo,
                                   size: 60, color: Theme.of(context).cardColor),
-                              // Image.network(
-                              //   documents[indexx]['imageUrl'],
-                              //   fit: BoxFit.cover,
-                              // ),
+
                               text: Text(
                                 "Create Story",
                                 maxLines: 1,
@@ -272,6 +275,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                             Positioned(
                                                 left: 10,
                                                 bottom: 10,
+                                                right: 10,
                                                 child: FittedBox(
                                                     child: Text(
                                                   documents[index]['username'],
@@ -307,128 +311,119 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                               margin:
                                   EdgeInsets.only(top: 15, right: 10, left: 10),
                               width: double.infinity,
-                              child: StreamBuilder(
-                                  stream: FirebaseFirestore.instance
-                                      .collection('last_message')
-                                  .where('userId1', isGreaterThanOrEqualTo: currentUserId)
-                                      .snapshots(),
+                              child: StreamBuilder  (
+                                  stream: _lastMessage,
                                   builder: (context, AsyncSnapshot snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
+                                    if (snapshot.connectionState == ConnectionState.waiting) {
                                       return Center(
                                         child: CircularProgressIndicator(),
                                       );
+                                          }
+                                    if(snapshot.data == null) {
+                                      return Center(child: CircularProgressIndicator());
                                     }
-                                    final documents = snapshot.data!.docs;
+                                    int indee=0;
+                                    final  documents = snapshot.data!.docs  ;
+                                    final userDataLastMessage =  FirebaseFirestore.instance
+                                        .collection('users').doc('userId2')
+                                        .get();
+                                    var isState;
                                     print('messages ${documents.length}');
-                                    return ListView.builder(
+                                    print('last messages ${_lastMessage}');
+                                    if (snapshot.hasError) {
+                                      return Text("got error ${snapshot.error}");
+                                    }
+
+
+                                    return  ListView.builder(
                                         scrollDirection: Axis.vertical,
                                         itemCount: documents.length,
-                                        itemBuilder: (ctx, index) {
-                                          var peerId = documents[index]['userId2'];
-                                          FirebaseFirestore.instance
-                                              .collection('users')
-                                              .where('userId',
-                                                  isEqualTo: peerId)
-                                              .snapshots();
-
+                                        itemBuilder: (context, index) {
                                           return Column(
                                             children: [
                                               Container(
                                                 child: ListTile(
                                                   contentPadding:
-                                                      EdgeInsets.all(5),
+                                                  EdgeInsets.all(5),
                                                   leading: Stack(
                                                     children: [
                                                       CircleAvatar(
                                                         radius: 25,
                                                         backgroundImage:
-                                                            NetworkImage(
-                                                                documents[index]
-                                                                    [
-                                                                    'userImage']),
+                                                        NetworkImage(documents[index]['userImage']),
                                                       ),
-                                                      Positioned(
-                                                          top: 35,
-                                                          left: 33,
-                                                          child: CircleAvatar(
-                                                            radius: 7,
-                                                            backgroundColor:
-                                                                documents[index]
-                                                                        [
-                                                                        'isStats']
-                                                                    ? Colors
-                                                                        .green
-                                                                    : Colors
-                                                                        .green
-                                                                        .withAlpha(
-                                                                            0),
-                                                          )),
+                                                      // Positioned(
+                                                      //     top: 35,
+                                                      //     left: 33,
+                                                      //     child: CircleAvatar(
+                                                      //       radius: 7,
+                                                      //       backgroundColor:
+                                                      //       documents[index]['isStats']
+                                                      //               ? Colors
+                                                      //                   .green
+                                                      //               : Colors
+                                                      //                   .green
+                                                      //                   .withAlpha(
+                                                      //                       0),
+                                                      //     )),
                                                     ],
                                                   ),
                                                   title: Text(
-                                                    documents[index]
-                                                        ['username'],
+                                                    documents[index]['username'],
                                                     style: TextStyle(
                                                         color: Colors.black,
                                                         fontWeight:
-                                                            FontWeight.normal,
+                                                        FontWeight.normal,
                                                         fontSize: 15),
                                                   ),
                                                   subtitle: Column(
                                                     children: [
-                                                      if (documents[index]
-                                                              ['type'] ==
-                                                          'Image')
+                                                      if (documents[index]['type'] == 'Image' )
                                                         Row(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
+                                                          MainAxisAlignment
+                                                              .start,
                                                           children: [
                                                             Text('Photo',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black87,
                                                                     fontSize:
-                                                                        13)),
+                                                                    13)),
                                                             Icon(Icons.photo,
                                                                 size: 15)
                                                           ],
                                                         ),
-                                                      if (documents[index]
-                                                              ['type'] ==
-                                                          'mp3')
+                                                      if (documents[index]['type']  == 'mp3')
                                                         Row(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
+                                                          MainAxisAlignment
+                                                              .start,
                                                           children: [
                                                             Text('🎵 Audio',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black87,
                                                                     fontSize:
-                                                                        13)),
+                                                                    13)),
                                                             Icon(
                                                                 Icons
                                                                     .music_video_rounded,
                                                                 size: 15)
                                                           ],
                                                         ),
-                                                      if (documents[index]
-                                                              ['type'] ==
-                                                          'file')
+                                                      if (documents[index]['type']  == 'file')
                                                         Row(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
+                                                          MainAxisAlignment
+                                                              .start,
                                                           children: [
                                                             Text('File Pdf',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black87,
                                                                     fontSize:
-                                                                        13)),
+                                                                    13)),
                                                             Icon(
                                                               Icons
                                                                   .picture_as_pdf,
@@ -436,20 +431,18 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                             )
                                                           ],
                                                         ),
-                                                      if (documents[index]
-                                                              ['type'] ==
-                                                          'voice')
+                                                      if (documents[index]['type'] == 'voice' )
                                                         Row(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
+                                                          MainAxisAlignment
+                                                              .start,
                                                           children: [
                                                             Text('Voice',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black87,
                                                                     fontSize:
-                                                                        13)),
+                                                                    13)),
                                                             Icon(
                                                               Icons
                                                                   .keyboard_voice_sharp,
@@ -457,15 +450,19 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                             )
                                                           ],
                                                         ),
-                                                      if (documents[index]
-                                                              ['type'] ==
-                                                          'text and image')
+                                                      if (documents[index]['type'] == 'text and image')
                                                         Row(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
+                                                          MainAxisAlignment
+                                                              .start,
                                                           children: [
-                                                            Text(documents[index]['text'] == ""? 'Photo' : documents[index]['text'],                                                              overflow: TextOverflow.ellipsis,
+                                                            Text(
+                                                              documents[index][
+                                                              'text']??'Send First Message'== "" ? 'Photo'
+                                                                  : documents[index]['text']??'Send First Message',
+                                                              overflow:
+                                                              TextOverflow
+                                                                  .ellipsis,
                                                             ),
                                                             Icon(
                                                               Icons.photo,
@@ -473,25 +470,28 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                             )
                                                           ],
                                                         ),
-                                                      if (documents[index]
-                                                              ['type'] ==
+                                                      if (documents[index]['type']==
                                                           'text')
                                                         Row(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .start,
+                                                          MainAxisAlignment
+                                                              .start,
                                                           children: [
                                                             Container(
-                                                              padding: EdgeInsets.only(right: 20),
+                                                              padding: EdgeInsets
+                                                                  .only(
+                                                                  right:
+                                                                  20),
                                                               child: Text(
-                                                                documents[index]
-                                                                    ['text'],
-                                                                overflow: TextOverflow.ellipsis,
-
+                                                                documents[index]['text']??'Send First Message',
+                                                                overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black87,
-                                                                    fontSize: 13),
+                                                                    fontSize:
+                                                                    13),
                                                               ),
                                                             ),
                                                           ],
@@ -500,8 +500,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                   ),
                                                   trailing: Text(
                                                     DateFormat("h:mm a").format(
-                                                        documents[index]
-                                                                ['timeSend']
+                                                        documents[index]['timeSend']
                                                             .toDate()),
                                                     style: TextStyle(
                                                         color: Colors.black87,
@@ -512,15 +511,11 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                         .push(MaterialPageRoute(
                                                       builder: (context) =>
                                                           ChatScreen(
-                                                              documents[index]
-                                                                  ['username'],
-                                                              documents[index]
-                                                                  ['userImage'],
-                                                              documents[index]
-                                                                  ['userId2'],
+                                                              documents[index]['username'],
+                                                              documents[index]['userImage'],
+                                                              documents[index]['userId2'],
                                                               currentUserId,
-                                                              documents[index]
-                                                                  ['isStats']),
+                                                              documents[index]['isStats']),
                                                     ));
                                                   },
                                                 ), //                           <-- Divider
@@ -530,6 +525,8 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                               // Divider(height: 0.02,color: Colors.grey),
                                             ],
                                           );
+
+
                                         });
                                   })),
                         ],
@@ -542,3 +539,206 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
             onWillPop: onWillPop));
   }
 }
+
+// class last_message_widget extends StatelessWidget {
+//   const last_message_widget({
+//     Key? key,
+//     required this.documents,
+//     required this.currentUserId,
+//   }) : super(key: key);
+//
+//   final List<DocumentSnapshot<Object?>> documents;
+//   final String currentUserId;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Column(
+//       children: [
+//         Container(
+//           child: ListTile(
+//             contentPadding:
+//                 EdgeInsets.all(5),
+//             leading: Stack(
+//               children: [
+//                 CircleAvatar(
+//                   radius: 25,
+//                   backgroundImage:
+//                       NetworkImage(documents[index]['userImage']),
+//                 ),
+//                 // Positioned(
+//                 //     top: 35,
+//                 //     left: 33,
+//                 //     child: CircleAvatar(
+//                 //       radius: 7,
+//                 //       backgroundColor:
+//                 //           documents[index]
+//                 //                   [
+//                 //                   'isStats']
+//                 //               ? Colors
+//                 //                   .green
+//                 //               : Colors
+//                 //                   .green
+//                 //                   .withAlpha(
+//                 //                       0),
+//                 //     )),
+//               ],
+//             ),
+//             title: Text(
+//               documents[index]['username'],
+//               style: TextStyle(
+//                   color: Colors.black,
+//                   fontWeight:
+//                       FontWeight.normal,
+//                   fontSize: 15),
+//             ),
+//             subtitle: Column(
+//               children: [
+//                 if (documents[index]['type'] == 'Image' )
+//                   Row(
+//                     mainAxisAlignment:
+//                         MainAxisAlignment
+//                             .start,
+//                     children: [
+//                       Text('Photo',
+//                           style: TextStyle(
+//                               color: Colors
+//                                   .black87,
+//                               fontSize:
+//                                   13)),
+//                       Icon(Icons.photo,
+//                           size: 15)
+//                     ],
+//                   ),
+//                 if (documents[index]['type']  == 'mp3')
+//                   Row(
+//                     mainAxisAlignment:
+//                         MainAxisAlignment
+//                             .start,
+//                     children: [
+//                       Text('🎵 Audio',
+//                           style: TextStyle(
+//                               color: Colors
+//                                   .black87,
+//                               fontSize:
+//                                   13)),
+//                       Icon(
+//                           Icons
+//                               .music_video_rounded,
+//                           size: 15)
+//                     ],
+//                   ),
+//                 if (documents[index]['type']  == 'file')
+//                   Row(
+//                     mainAxisAlignment:
+//                         MainAxisAlignment
+//                             .start,
+//                     children: [
+//                       Text('File Pdf',
+//                           style: TextStyle(
+//                               color: Colors
+//                                   .black87,
+//                               fontSize:
+//                                   13)),
+//                       Icon(
+//                         Icons
+//                             .picture_as_pdf,
+//                         size: 15,
+//                       )
+//                     ],
+//                   ),
+//                 if (documents[index]['type'] == 'voice' )
+//                   Row(
+//                     mainAxisAlignment:
+//                         MainAxisAlignment
+//                             .start,
+//                     children: [
+//                       Text('Voice',
+//                           style: TextStyle(
+//                               color: Colors
+//                                   .black87,
+//                               fontSize:
+//                                   13)),
+//                       Icon(
+//                         Icons
+//                             .keyboard_voice_sharp,
+//                         size: 15,
+//                       )
+//                     ],
+//                   ),
+//                 if (documents[index]['type'] == 'text and image')
+//                   Row(
+//                     mainAxisAlignment:
+//                         MainAxisAlignment
+//                             .start,
+//                     children: [
+//                       Text(
+//                         documents[index][
+//                                     'text']??'Send First Message'== "" ? 'Photo'
+//                             : documents[index]['text']??'Send First Message',
+//                         overflow:
+//                             TextOverflow
+//                                 .ellipsis,
+//                       ),
+//                       Icon(
+//                         Icons.photo,
+//                         size: 15,
+//                       )
+//                     ],
+//                   ),
+//                 if (documents[index]['type']==
+//                     'text')
+//                   Row(
+//                     mainAxisAlignment:
+//                         MainAxisAlignment
+//                             .start,
+//                     children: [
+//                       Container(
+//                         padding: EdgeInsets
+//                             .only(
+//                                 right:
+//                                     20),
+//                         child: Text(
+//                           documents[index]['text']??'Send First Message',
+//                           overflow:
+//                               TextOverflow
+//                                   .ellipsis,
+//                           style: TextStyle(
+//                               color: Colors
+//                                   .black87,
+//                               fontSize:
+//                                   13),
+//                         ),
+//                       ),
+//                     ],
+//                   )
+//               ],
+//             ),
+//             trailing: Text(
+//               DateFormat("h:mm a").format(
+//                   documents[index]['timeSend']
+//                       .toDate()),
+//               style: TextStyle(
+//                   color: Colors.black87,
+//                   fontSize: 10),
+//             ),
+//             onTap: () async {
+//               await Navigator.of(context)
+//                   .push(MaterialPageRoute(
+//                 builder: (context) =>
+//                     ChatScreen(
+//                         documents[index]['username'],
+//                         documents[index]['userImage'],
+//                         documents[index]['userId2'],
+//                         currentUserId,
+//                         documents[index]['isStats']),
+//               ));
+//             },
+//           ), //                           <-- Divider
+//         ),
+//         // Divider(),
+//
+//         // Divider(height: 0.02,color: Colors.grey),
+//       ],
+//     );
+//   }
+// }

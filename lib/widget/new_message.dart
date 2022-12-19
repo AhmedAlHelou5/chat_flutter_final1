@@ -108,11 +108,18 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'userId2': peerId,
             'userId1': currentUserId,
             'userImage': userDataLastMessage['image_url'],
-            'isStats': userDataLastMessage['isStats'],
             'type': 'text',});
 
 
 
+          //  FirebaseFirestore.instance
+          //     .collection('users')
+          //     .doc(currentUserId)
+          //     .update({
+          //   'text':_enteredMessage,
+          //   'type':'voice',
+          //   'timeSend':Timestamp.now()
+          // });
 
 
           _controller.clear();
@@ -185,10 +192,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'userId2': peerId,
             'userId1': currentUserId,
             'userImage': userDataLastMessage['image_url'],
-            'isStats': userDataLastMessage['isStats'],
             'type': 'voice',});
-
-
           _controller.clear();
           setState(() {
             _enteredMessage = '';

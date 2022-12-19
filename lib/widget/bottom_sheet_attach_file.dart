@@ -121,7 +121,6 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
           'userId2': peerId,
           'userId1': currentUserId,
           'userImage': userDataLastMessage['image_url'],
-          'isStats': userDataLastMessage['isStats'],
           'type': type,});
 
         setState(() async{
