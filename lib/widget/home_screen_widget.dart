@@ -23,6 +23,9 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   late User signedInUser;
 
   final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+   bool? peerStats ;
+
+
 
   void SetStatus(bool status) {
     FirebaseFirestore.instance.collection('users').doc(currentUserId).update({
@@ -71,6 +74,9 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
     getCurrentUser();
     WidgetsBinding.instance.addObserver(this);
     SetStatus(true);
+
+
+
   }
 
   @override
@@ -148,6 +154,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
         .collection('last_message')
         .where('userId1', isEqualTo: currentUserId)
         .snapshots();
+
     return Scaffold(
         appBar: PreferredSize(
           //wrap with PreferredSize
@@ -208,7 +215,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                     flex: 1,
                     child: StreamBuilder(
                         stream: FirebaseFirestore.instance
-                            .collection('stories')
+                            .collection('stories').where('show',isEqualTo: true)
                             .snapshots(),
                         builder: (context, AsyncSnapshot snapshot) {
                           if (snapshot.connectionState ==
@@ -233,7 +240,6 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                               itemMargin: 8,
                               borderRadius: 5,
                               iconSize: 10,
-                              height: 200,
                               addItemBackgroundColor:
                                   Theme.of(context).accentColor,
                               image: Icon(Icons.add_a_photo,
@@ -265,22 +271,24 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                         Stack(
                                           children: [
                                             Container(
-                                              width: 80,
-                                              height: 100,
+                                              width: MediaQuery.of(context).size.width*0.2,
+                                              height: MediaQuery.of(context).size.height*0.111,
                                               child: Image.network(
                                                 documents[index]['imageUrl'],
-                                                fit: BoxFit.fill,
+                                                fit: BoxFit.cover,
                                               ),
                                             ),
                                             Positioned(
                                                 left: 10,
-                                                bottom: 10,
+                                                bottom: 15,
                                                 right: 10,
                                                 child: FittedBox(
                                                     child: Text(
                                                   documents[index]['username'],
                                                   style: TextStyle(
                                                       color: Colors.white),
+                                                      // overflow:ellipsis,
+                                                      softWrap: true,
                                                 )))
                                           ],
                                         )
@@ -324,10 +332,14 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                     }
                                     int indee=0;
                                     final  documents = snapshot.data!.docs  ;
-                                    final userDataLastMessage =  FirebaseFirestore.instance
-                                        .collection('users').doc('userId2')
-                                        .get();
-                                    var isState;
+                                    // final userDataLastMessage =  FirebaseFirestore.instance
+                                    //     .collection('users').doc('userId')
+                                    //     .get();
+                                    // var isState;
+
+
+
+
                                     print('messages ${documents.length}');
                                     print('last messages ${_lastMessage}');
                                     if (snapshot.hasError) {
@@ -358,7 +370,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                       //     child: CircleAvatar(
                                                       //       radius: 7,
                                                       //       backgroundColor:
-                                                      //       documents[index]['isStats']
+                                                      //       peerStats!
                                                       //               ? Colors
                                                       //                   .green
                                                       //               : Colors
@@ -434,8 +446,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                       if (documents[index]['type'] == 'voice' )
                                                         Row(
                                                           mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
+                                                          MainAxisAlignment.start,
                                                           children: [
                                                             Text('Voice',
                                                                 style: TextStyle(
@@ -457,9 +468,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                               .start,
                                                           children: [
                                                             Text(
-                                                              documents[index][
-                                                              'text']??'Send First Message'== "" ? 'Photo'
-                                                                  : documents[index]['text']??'Send First Message',
+                                                              documents[index]['text']!='' ?  documents[index]['text'] :  ' Photo' ,
                                                               overflow:
                                                               TextOverflow
                                                                   .ellipsis,
@@ -507,15 +516,28 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                         fontSize: 10),
                                                   ),
                                                   onTap: () async {
+                                                   await FirebaseFirestore.instance
+                                                        .collection('users')
+                                                        .doc(documents[index]['userId2'])
+                                                        .get()
+                                                        .then((value) async {
+                                                      if (value.exists) {
+                                                        setState(() {
+                                                          peerStats = value.data()!['isStats'];
+
+                                                        });
+                                                      }
+                                                    });
                                                     await Navigator.of(context)
                                                         .push(MaterialPageRoute(
                                                       builder: (context) =>
                                                           ChatScreen(
-                                                              documents[index]['username'],
-                                                              documents[index]['userImage'],
-                                                              documents[index]['userId2'],
-                                                              currentUserId,
-                                                              documents[index]['isStats']),
+                                                              documents[index]['username']!,
+                                                              documents[index]['userImage']!,
+                                                              documents[index]['userId2']!,
+                                                            documents[index]['userId1']!,
+                                                            isState: peerStats,
+                                                              ),
                                                     ));
                                                   },
                                                 ), //                           <-- Divider

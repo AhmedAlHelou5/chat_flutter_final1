@@ -167,7 +167,7 @@ class _OnlineScreenState extends State<OnlineScreen>
                 Card(
                   elevation: 5,
                   child: Container(
-                      height: MediaQuery.of(context).size.height * 0.75,
+                      height: MediaQuery.of(context).size.height * 0.73,
                       margin: EdgeInsets.only(
                           top: 15, right: 10, left: 10),
                       width: double.infinity,
@@ -273,8 +273,7 @@ class _OnlineScreenState extends State<OnlineScreen>
                                                       documents[index]
                                                       ['userId'],
                                                       currentUserId,
-                                                      documents[index]
-                                                      ['isStats']),
+                                                      isState: isStats),
                                             ));
                                           },
                                         ), //                           <-- Divider

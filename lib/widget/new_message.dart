@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_cacheing/functions/custom_functions.dart';
 import 'package:social_media_recorder/audio_encoder_type.dart';
 import 'package:social_media_recorder/screen/social_media_recorder.dart';
 
@@ -81,9 +82,8 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
           _isConnected = true;
           FirebaseFirestore.instance
               .collection('messages')
-              .doc(widget.groupChatId)
-              .collection(widget.groupChatId)
-              .add({
+              .doc(widget.groupChatId).collection(widget.groupChatId).doc(DateTime.now().millisecondsSinceEpoch.toString())
+              .set({
             'id': DateTime.now().millisecondsSinceEpoch.toString(),
             'text': _enteredMessage,
             'imageUrl': null,
@@ -95,6 +95,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'userImage': userData['image_url'],
             'isStats': userData['isStats'],
             'type': 'text',
+            'delete': false,
           });
 
 
@@ -108,7 +109,8 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'userId2': peerId,
             'userId1': currentUserId,
             'userImage': userDataLastMessage['image_url'],
-            'type': 'text',});
+            'type': 'text',
+          });
 
 
 
@@ -160,14 +162,15 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
         UploadTask task = imagefile.putFile(file);
         TaskSnapshot snapshot = await task;
         url = await snapshot.ref.getDownloadURL();
+        // var uuid = Uuid();
 
         setState(() {
           _isConnected = true; });
         await  FirebaseFirestore.instance
               .collection('messages')
               .doc(widget.groupChatId)
-              .collection(widget.groupChatId)
-              .add({
+              .collection(widget.groupChatId).doc(DateTime.now().millisecondsSinceEpoch.toString())
+              .set({
             'id': DateTime.now().millisecondsSinceEpoch.toString(),
             'text': null,
             'imageUrl': null,
@@ -178,6 +181,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'userId1': currentUserId,
             'userImage': userData['image_url'],
             'isStats': userData['isStats'],
+            'delete': false,
             'type': 'voice',
           });
 
@@ -192,7 +196,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'userId2': peerId,
             'userId1': currentUserId,
             'userImage': userDataLastMessage['image_url'],
-            'type': 'voice',});
+          'type': 'voice',});
           _controller.clear();
           setState(() {
             _enteredMessage = '';
@@ -302,8 +306,6 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                                 print("the current path is ${soundFile.path}");
                                 _sendMessageVoice(soundFile);
 
-                                  setState(() async{
-
                                         var imagefile = FirebaseStorage.instance.ref('ChatRoom').child(
                                         '/file ${widget.groupChatId}').child("/${widget.username}");
                                         UploadTask task = imagefile.putFile(soundFile);
@@ -316,9 +318,9 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                                         .update({
                                       'text':url,
                                       'type':'voice',
-                                      'timeSend':Timestamp.now()
+                                      'timeSend':Timestamp.now(),
+
                                     });
-                                  });
 
 
                               },
@@ -353,20 +355,21 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                   color: Theme.of(context).primaryColor,
                   onPressed:  () {
                     _sendMessage();
-                    _scrollController.animateTo(
-                        _scrollController.position.maxScrollExtent,
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.easeInOut);
+
                     setState(() async {
                      await FirebaseFirestore.instance
-                          .collection('last_message')
-                          .doc(signedInUser.uid)
-                         .collection(signedInUser.uid).doc(widget.userId2)
+                         .collection('last_message')
+                         .doc('${signedInUser.uid}-${widget.userId2}')
                           .update({
                         'text':_enteredMessage,
                         'timeSend':Timestamp.now()
                       });
                     });
+                    _scrollController.animateTo(
+                        _scrollController.position.maxScrollExtent,
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.easeInOut);
+
                     },
                   icon: Icon(
                     Icons.send,
@@ -413,16 +416,4 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
   }
 
 
-// Future<bool> onBackPress() {
-//   if (emojiShowing) {
-//     setState(() {
-//       emojiShowing = false;
-//     });
-//   } else {
-//     Navigator.pop(context);
-//   }
-//
-//   return Future.value(false);
-//
-// }
 }

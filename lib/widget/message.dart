@@ -12,7 +12,6 @@ class Message extends StatefulWidget {
   final bool isStats;
   final String groupChatId;
   final String userId2;
-
   bool isMe;
 
   @override
@@ -25,9 +24,7 @@ class _MessageState extends State<Message> {
   var currentUserId=FirebaseAuth.instance.currentUser!.uid ;
   @override
   Widget build(BuildContext context) {
-
-    final message=
-    FirebaseFirestore.instance
+    final message= FirebaseFirestore.instance
         .collection('messages')
         .doc(widget.groupChatId)
         .collection(widget.groupChatId)
@@ -52,6 +49,7 @@ class _MessageState extends State<Message> {
           chat.add(
             MessageBubble(
             message: element['text'] ??'',
+            id: element['id'] ,
             type: element['type'],
             userName:element['username'],
             userImage: element['userImage'],
@@ -62,7 +60,7 @@ class _MessageState extends State<Message> {
             date: element['createdAt'],
             isMe: element['userId2'] == widget.userId2 ? widget.isMe=false : widget.isMe=true,
             isState: widget.isStats,
-            key: ValueKey(currentUser.uid ),
+            key: ValueKey(currentUser.uid),
             ) );
         });
 

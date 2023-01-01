@@ -12,14 +12,12 @@ import 'package:file_picker/file_picker.dart';
 
 import '../screen/upload_story_screen.dart';
 
-
-class BottomSheetForStoryPick extends StatefulWidget{
-
+class BottomSheetUpdateImage extends StatefulWidget {
   @override
-  State<StatefulWidget> createState()=>_BottomSheetForStoryPickState();
-  
+  State<StatefulWidget> createState() => _BottomSheetUpdateImageState();
 }
-class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
+
+class _BottomSheetUpdateImageState extends State<BottomSheetUpdateImage> {
   bool isLoading = true;
   File? file;
   var name;
@@ -29,27 +27,9 @@ class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
 
   String imageUrl = "";
 
-  getfile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['mp4'],
-    );
-
-    if (result != null) {
-      File c = File(result.files.single.path.toString());
-      setState(() {
-        file = c;
-        name = result.names.toString();
-      });
-      Navigator.of(context).pop();
-      await  uploadFile('video');
-    }
-  }
   bool? _isConnected;
 
-
-
-  uploadFile(String type) async {
+  uploadFile(File? file) async {
     try {
       final _auth = FirebaseAuth.instance;
       final user = FirebaseAuth.instance.currentUser!;
@@ -61,29 +41,50 @@ class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
       final response = await InternetAddress.lookup('www.google.com');
       try {
         if (response.isNotEmpty) {
-          var imagefile = FirebaseStorage.instance.ref('Story').child(
-              '/story ${currentUserId}');
+          var imagefile = FirebaseStorage.instance
+              .ref()
+              .child('user_image')
+              .child(currentUserId + '.jpg');
+          ;
           UploadTask task = imagefile.putFile(file!);
           TaskSnapshot snapshot = await task;
           url = await snapshot.ref.getDownloadURL();
 
           await FirebaseFirestore.instance
+              .collection('users')
+              .doc(currentUserId)
+              .update({
+            'image_url': url,
+          });
+          await FirebaseFirestore.instance
               .collection('stories')
               .doc(currentUserId)
-              .collection(currentUserId)
-              .add({
-            'file': url,
-            'createdAt': Timestamp.now(),
-            'username': userData['username'],
-            'userId1': currentUserId,
-            'userImage': userData['image_url'],
-            'isStats': userData['isStats'],
-            'show': true,
-            'type': type,
+              .update({
+            'image_url': url,
+          });
+          await FirebaseFirestore.instance
+              .collection('last_message')
+              .doc(currentUserId)
+              .collection(currentUserId).doc(currentUserId)
+              .update({
+            'image_url': url,
+          });
+
+          await  FirebaseFirestore.instance
+              .collection('messages').doc(currentUserId).collection(currentUserId).
+          where('userId1',isEqualTo: true).
+          where('userId2',isEqualTo: true).get().then((value) async {
+            await FirebaseFirestore.instance
+                .collection('messages')
+                .doc(currentUserId)
+                .collection(currentUserId).doc(currentUserId).
+            update({
+              'image_url': url,
+            });
           });
 
 
-          if (url != null && file != null) {
+            if (url != null && file != null) {
             Fluttertoast.showToast(
               msg: "Done Uploaded",
               textColor: Colors.red,
@@ -100,24 +101,24 @@ class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
           msg: e.toString(),
           textColor: Colors.red,
         );
-      }}on SocketException catch (err) {
+      }
+    } on SocketException catch (err) {
       setState(() {
         _isConnected = false;
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Don’t Send because No Internet connection')));
-
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Don’t Send because No Internet connection')));
       });
       if (kDebugMode) {
         print(err);
       }
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.20,
-      width: MediaQuery.of(context).size.width,
+      width: MediaQuery.of(context).size.width * 0.50,
       child: Card(
         margin: const EdgeInsets.all(18.0),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -130,65 +131,21 @@ class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
                 children: [
                   InkWell(
                     onTap: () async {
-                      getfile();
-                    },
-                    child: Column(
-                      children: const [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Colors.indigo,
-                          child: Icon(
-                            Icons.videocam,
-                            // semanticLabel: "Help",
-                            size: 29,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          'Video',
-                          style: TextStyle(
-                            fontSize: 12,
-                            // fontWeight: FontWeight.w100,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 30,
-                  ),
-                  InkWell(
-                    onTap: () async {
                       File? _pickedImage;
                       final ImagePicker _picker = ImagePicker();
-                      final user = FirebaseAuth.instance.currentUser!;
-                      final userData = await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(user.uid)
-                          .get();
 
                       final pickedImageFile =
-                      await _picker.pickImage(source: ImageSource.camera);
+                          await _picker.pickImage(source: ImageSource.camera);
                       if (pickedImageFile != null) {
                         setState(() {
                           _pickedImage = File(pickedImageFile.path);
                           Navigator.of(context).pop();
+                          uploadFile(_pickedImage);
 
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => UploadStoryScreen(
-                                _pickedImage!,
-                                  userData['username'],
-
-                                )));
                         });
-
                       } else {
                         print('No picked image');
                       }
-
                     },
                     child: Column(
                       children: const [
@@ -229,7 +186,7 @@ class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
                           .get();
 
                       final pickedImageFile =
-                      await _picker.getImage(source: ImageSource.gallery);
+                          await _picker.getImage(source: ImageSource.gallery);
                       if (pickedImageFile != null) {
                         setState(() {
                           _pickedImage = File(pickedImageFile.path);
@@ -237,11 +194,8 @@ class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
 
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) => UploadStoryScreen(
-                                  _pickedImage!,
-                                  userData['username'])));
-
+                                  _pickedImage!, userData['username'])));
                         });
-
                       } else {
                         print('No picked image');
                       }
@@ -273,7 +227,6 @@ class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
                       ],
                     ),
                   ),
-
                 ],
               ),
             ],

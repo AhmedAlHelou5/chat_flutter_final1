@@ -124,31 +124,34 @@ class _MoreStoriesState extends State<MoreStories> {
             ),
           ),
 
+
+
         ]),
-        leadingWidth: 150,
-        title: InkWell(
-          onTap:  () async {
-            await Navigator.of(context)
-                .push(MaterialPageRoute(builder: (context) =>AddStory()));
-          },
-          child: Row(
-            children: [
-              Container(
-                child: CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(widget.imageUser!),
+        leadingWidth: 70,
+        flexibleSpace:Container(
+          margin: EdgeInsets.only(left: 40,top: 50),
+          child: InkWell(
+            onTap:  () async {
+              await Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) =>AddStory()));
+            },
+            child: Row(
+              children: [
+                Container(
+                  child: CircleAvatar(
+                    radius: 18,
+                    backgroundImage: NetworkImage(widget.imageUser!),
+                  ),
                 ),
-              ), Container(
-                margin: EdgeInsets.only(left: 7,top: 3),
-                  child: FittedBox(fit: BoxFit.contain,child: Text(widget.username!,style: TextStyle(color: Colors.white,fontSize: 14,fontWeight: FontWeight.bold),)),
+                Container(
+                  margin: EdgeInsets.only(left: 7,top: 3,right: 10),
+                  child: FittedBox(fit: BoxFit.contain,child: Text(widget.username!,style: TextStyle(color: Colors.white,fontSize: 16,fontWeight: FontWeight.bold),)),
                 ),
 
-            ],
+              ],
+            ),
           ),
-        ),
-
-
-        ),
+        ),),
 
       body: StoryView(
         storyItems: [

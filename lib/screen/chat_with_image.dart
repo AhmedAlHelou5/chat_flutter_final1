@@ -42,19 +42,18 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
           final ref = FirebaseStorage.instance
               .ref().child('ChatRoom')
               .child(widget.groupChatId)
-              .child('${DateTime
-              .now()
-              .millisecondsSinceEpoch}.jpg');
+              .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
 
           await  ref.putFile(widget.imageUrl!);
 
           final url = await ref.getDownloadURL();
+          print(url);
 
         await  FirebaseFirestore.instance
               .collection('messages')
               .doc(widget.groupChatId)
-              .collection(widget.groupChatId)
-              .add({
+              .collection(widget.groupChatId).doc(DateTime.now().millisecondsSinceEpoch.toString())
+              .set({
           'id': DateTime.now().millisecondsSinceEpoch.toString(),
           'text': _enteredMessage ,
             'imageUrl': url,
@@ -66,7 +65,9 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
             'userImage': userData['image_url'],
             'isStats': userData['isStats'],
             'type': 'text and image',
-          });
+           'delete': false,
+
+        });
 
         await   FirebaseFirestore.instance
             .collection('last_message')
@@ -78,7 +79,8 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
             'userId2': peerId,
             'userId1': currentUserId,
             'userImage': userDataLastMessage['image_url'],
-            'type': 'text and image',});
+          'type': 'text and image',});
+
 
           setState(()  {
             _isConnected = true;
@@ -88,6 +90,7 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
           setState(() {
             _enteredMessage = '';
           });
+
 
 
       }
@@ -212,21 +215,19 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
                         disabledColor: Colors.white70,
                         onPressed: (){
                           widget.imageUrl.toString().isEmpty
-                            ? null
-                            : _sendMessage();
+                            ?  _sendMessage()
+                            :_sendMessage() ;
                           Navigator.of(context).pop();
 
-                          setState(() async{
-                            await FirebaseFirestore.instance
+                          setState(() {
+                             FirebaseFirestore.instance
                                 .collection('last_message')
-                                .doc()
-                                .collection(currentUserId).doc(widget.userId2)
+                                .doc('$currentUserId-${widget.userId2}')
                                 .update({
                               'text':_enteredMessage,
                               'type':'text and image',
                               'timeSend':Timestamp.now()
                             });
-
                           });
 
 

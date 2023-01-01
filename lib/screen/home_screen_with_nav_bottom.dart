@@ -1,4 +1,5 @@
 import 'package:chat_flutter_final/screen/add_story.dart';
+import 'package:chat_flutter_final/screen/profile_screen.dart';
 import 'package:chat_flutter_final/screen/search_screen.dart';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
@@ -54,7 +55,7 @@ class _HomeScreenWithNavBottomState extends State<HomeScreenWithNavBottom> {
           ),
           FlashyTabBarItem(
               icon: Icon(Icons.location_history),
-              title: Text('STORY'),
+              title: Text('Profile'),
               activeColor: Colors.pink
 
           ),
@@ -75,7 +76,7 @@ class _HomeScreenWithNavBottomState extends State<HomeScreenWithNavBottom> {
       case 2:
         return SearchScreen();
         case 3:
-        return AddStory();
+        return ProfileScreen();
       default:
         return HomeScreenWidget();
     }}

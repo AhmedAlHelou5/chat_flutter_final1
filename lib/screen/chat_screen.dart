@@ -17,11 +17,11 @@ class ChatScreen extends StatefulWidget {
   String username;
   String userId2;
   String userId1;
-  bool isState;
+  bool? isState;
 
   ChatScreen(
-      this.username, this.image, this.userId2, this.userId1, this.isState,
-      {Key? key})
+      this.username, this.image, this.userId2, this.userId1,
+      {Key? key, this.isState})
       : super(key: key);
 
   @override
@@ -107,7 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
             Container(
                 margin: EdgeInsets.only(top: 15), child: Text(widget.username)),
             Container(
-                child: widget.isState
+                child: widget.isState!
                     ? Text(
                         'Online',
                         style: TextStyle(fontSize: 12, color: Colors.grey[350]),
@@ -138,7 +138,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 child: CircleAvatar(
                   radius: 5,
                   backgroundColor:
-                      widget.isState ? Colors.green : Colors.green.withAlpha(0),
+                      widget.isState! ? Colors.green : Colors.green.withAlpha(0),
                 )),
           ]),
           leadingWidth: 80,
@@ -151,11 +151,11 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: <Widget>[
             Expanded(
-              child: Message(widget.isState, chatRoomId, widget.userId2,
+              child: Message(widget.isState!, chatRoomId, widget.userId2,
                   widget.userId1 == currentUserId ? true : false),
             ),
             NewMessage(widget.username, widget.image, widget.userId2,
-                chatRoomId, widget.isState),
+                chatRoomId, widget.isState!),
 
           ],
         ),

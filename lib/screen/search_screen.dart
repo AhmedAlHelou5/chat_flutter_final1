@@ -320,9 +320,10 @@ class _SearchScreenState extends State<SearchScreen>
                                         documents[index]
                                         ['userId'],
                                         currentUserId,
-                                        documents[index]
-                                        [
-                                        'isStats']),
+                                      isState: documents[index]
+                                      ['isStats'],
+
+                                       ),
                               ));
 
 

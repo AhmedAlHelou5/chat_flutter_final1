@@ -55,12 +55,14 @@ class _UploadStoryScreenState extends State<UploadStoryScreen>{
             'userId1': currentUserId,
             'userImage': userData['image_url'],
             'isStats': userData['isStats'],
+             'show': true,
             'type': 'image_story',
           });
+        Navigator.of(context).pop();
+
         setState(() {
           _isConnected = true;
         });
-        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('uploaded')));
       }

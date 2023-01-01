@@ -154,8 +154,7 @@ class _AddStoryState extends State<AddStory>  with WidgetsBindingObserver {
           showModalBottomSheet(
             backgroundColor: Colors.transparent,
             context: context,
-            builder: (builder) => BottomSheetForStoryPick(
-            ),
+            builder: (builder) => BottomSheetForStoryPick(),
           );
         },
         child: Center(
@@ -174,9 +173,10 @@ class _AddStoryState extends State<AddStory>  with WidgetsBindingObserver {
                           showModalBottomSheet(
                             backgroundColor: Colors.transparent,
                             context: context,
-                            builder: (builder) => BottomSheetForStoryPick(
-                              ),
+                            builder: (builder) => BottomSheetForStoryPick(),
                           );
+                          Navigator.of(context).pop();
+
                         },
                         child: Text('Add Story', style: TextStyle(color: Colors.pink,fontSize: 20,)),
                       ),
