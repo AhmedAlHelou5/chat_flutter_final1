@@ -10,11 +10,15 @@ import 'list_user_screen.dart';
 import 'online_screen.dart';
 
 class HomeScreenWithNavBottom extends StatefulWidget {
+  int currentPage;
+
+  HomeScreenWithNavBottom({required this.currentPage});
+
   @override
   State<HomeScreenWithNavBottom> createState() => _HomeScreenWithNavBottomState();
 }
 class _HomeScreenWithNavBottomState extends State<HomeScreenWithNavBottom> {
-  int currentPage = 0;
+  // int currentPage = 0;
    String? groupChatId='';
    String? userId2='';
   GlobalKey bottomNavigationKey = GlobalKey();
@@ -25,15 +29,15 @@ class _HomeScreenWithNavBottomState extends State<HomeScreenWithNavBottom> {
       body: Container(
         decoration: BoxDecoration(color: Colors.white),
         child: Center(
-          child: _getPage(currentPage),
+          child: _getPage(widget.currentPage),
         ),
       ),
       bottomNavigationBar: FlashyTabBar(
         animationCurve: Curves.linear,
-        selectedIndex: currentPage,
+        selectedIndex: widget.currentPage,
         showElevation: false, // use this to remove appBar's elevation
         onItemSelected: (index) => setState(() {
-          currentPage = index;
+          widget.currentPage = index;
         }),
         items: [
           FlashyTabBarItem(

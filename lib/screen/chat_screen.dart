@@ -42,6 +42,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+
   bool? _isConnected;
 
   // This function is triggered when the floating button is pressed
@@ -91,10 +92,11 @@ class _ChatScreenState extends State<ChatScreen> {
       groupChatId = '$peerId-$currentUserId';
     }
     var chatRoomId = groupChatId;
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(groupChatId)
-        .update({'chattingWith': peerId});
+    // FirebaseFirestore.instance
+    //     .collection('users')
+    //     .doc(groupChatId)
+    //     .update({'chattingWith': peerId});
+
 
     return Scaffold(
       appBar: PreferredSize(

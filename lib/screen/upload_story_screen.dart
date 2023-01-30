@@ -43,6 +43,7 @@ class _UploadStoryScreenState extends State<UploadStoryScreen>{
         print(url);
         // List list=[];
         // list.add(url);
+        Navigator.of(context).pop();
 
         await FirebaseFirestore.instance
               .collection('stories')
@@ -58,7 +59,6 @@ class _UploadStoryScreenState extends State<UploadStoryScreen>{
              'show': true,
             'type': 'image_story',
           });
-        Navigator.of(context).pop();
 
         setState(() {
           _isConnected = true;

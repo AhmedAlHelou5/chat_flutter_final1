@@ -11,6 +11,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 
 import '../screen/chat_screen.dart';
+import '../screen/home_screen_with_nav_bottom.dart';
 
 class HomeScreenWidget extends StatefulWidget {
   @override
@@ -23,15 +24,22 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   late User signedInUser;
 
   final currentUserId = FirebaseAuth.instance.currentUser!.uid;
-   bool? peerStats ;
-
-
+  bool? peerStats;
 
   void SetStatus(bool status) {
     FirebaseFirestore.instance.collection('users').doc(currentUserId).update({
       'isStats': status,
     });
   }
+
+  // void SetShow(bool show) {
+  //  FirebaseFirestore.instance
+  //       .collection('stories')
+  //       .doc(currentUserId)
+  //       .update({
+  //     'show': show,
+  //   });
+  // }
 
   void getCurrentUser() {
     try {
@@ -74,6 +82,11 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
     getCurrentUser();
     WidgetsBinding.instance.addObserver(this);
     SetStatus(true);
+
+    FirebaseFirestore.instance
+        .collection('stories')
+        .where('show', isEqualTo: true)
+        .snapshots();
 
 
 
@@ -126,6 +139,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
   }
 
   String groupChatId = "";
+  bool? show ;
 
   final userData = FirebaseFirestore.instance.collection('users').snapshots();
 
@@ -147,13 +161,30 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
     return Future.value(true);
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final _lastMessage =FirebaseFirestore.instance
+   final _lastMessage = FirebaseFirestore.instance
         .collection('last_message')
-        .where('userId1', isEqualTo: currentUserId)
-        .snapshots();
+       .where('userId1', isEqualTo: currentUserId,)
+       .snapshots();
+    //     .then((value) {
+    //  Map data = value.data() as Map;
+    //
+    //  data['userId2'];
+    //   print(  data['userId1']);
+    //   print(  data['userId2']);
+    // });
+   // FirebaseFirestore.instance.collection('last_message').doc().get().then((value) {
+   //   value.get('userId2');
+   //  });
+
+    //
+    // final _lastMessage = FirebaseFirestore.instance
+    //     .collection('last_message')
+    //     // .where(currentUserId,isNotEqualTo:['userId1'])
+    //     // .where('userId1', arrayContains: [currentUserId],)
+    //     // .where('userId2',isGreaterThan: [currentUserId])
+    //     .snapshots();
 
     return Scaffold(
         appBar: PreferredSize(
@@ -175,7 +206,10 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                   child: DropdownButton(
                     underline: Container(),
                     icon: Icon(Icons.menu,
-                        color: Theme.of(context).primaryIconTheme.color,
+                        color: Theme
+                            .of(context)
+                            .primaryIconTheme
+                            .color,
                         size: 27),
                     items: [
                       DropdownMenuItem(
@@ -184,12 +218,27 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                           children: const [
                             Icon(
                               Icons.exit_to_app,
-                              color: Colors.black,
+                              color: Colors.pink,
                             ),
                             SizedBox(
                               width: 8,
                             ),
                             Text('Logout'),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Settings',
+                        child: Row(
+                          children: const [
+                            Icon(
+                              Icons.settings,
+                              color: Colors.pink,
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text('Settings'),
                           ],
                         ),
                       )
@@ -199,8 +248,15 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                         SetStatus(false);
                         await FirebaseAuth.instance.signOut();
                       }
+                      if (itemIdentifier == 'Settings') {
+                        await Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) =>HomeScreenWithNavBottom(currentPage: 3)
+
+                        ));
+                      }
                     },
                   ),
+
                 ),
               ]),
         ),
@@ -215,7 +271,10 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                     flex: 1,
                     child: StreamBuilder(
                         stream: FirebaseFirestore.instance
-                            .collection('stories').where('show',isEqualTo: true)
+                            .collection('stories')
+                            .where('show',isEqualTo: true )
+                            // .where('createdAt', isGreaterThan: DateTime.now().subtract( Duration(hours: 24)))
+                            // .where('show', isEqualTo: true)
                             .snapshots(),
                         builder: (context, AsyncSnapshot snapshot) {
                           if (snapshot.connectionState ==
@@ -225,6 +284,7 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                             );
                           }
                           final documents = snapshot.data!.docs;
+
                           print('messages ${documents.length}');
                           return StoryList(
                               onPressedIcon: () {
@@ -244,7 +304,6 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                   Theme.of(context).accentColor,
                               image: Icon(Icons.add_a_photo,
                                   size: 60, color: Theme.of(context).cardColor),
-
                               text: Text(
                                 "Create Story",
                                 maxLines: 1,
@@ -254,7 +313,44 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                 ),
                               ),
                               itemCount: documents.length,
-                              itemBuilder: (context, index) => InkWell(
+
+                              itemBuilder: (context, index) {
+
+                                // DateTime dt1 = DateTime.parse(DateTime.now().toString());
+                                // DateTime dt2 = DateTime.parse(documents[index]['createdAt'].toDate().toString());
+                                // Duration diff = dt1.difference(dt2);
+                                // print('$dt2');
+                                // // diff.inHours < 24 ? SetShow(false) : SetShow(true);
+                                // // if(diff.inDays > 1) {
+                                // //   SetShow(false);
+                                // // }
+                                //
+                                // print('${diff.inDays}');
+                                //
+                                // // if(diff.inHours<=24 && diff.inHours >= 0){
+                                // //    FirebaseFirestore.instance
+                                // //       .collection('stories')
+                                // //       .doc(currentUserId)
+                                // //       .update({
+                                // //     'show': true,
+                                // //   });
+                                // //   // SetShow(true);
+                                // // }else if (diff.inHours>24){
+                                // //   FirebaseFirestore.instance
+                                // //       .collection('stories')
+                                // //       .doc(currentUserId)
+                                // //       .update({
+                                // //     'show': false,
+                                // //   });
+                                // //   SetShow(false);
+                                // // }
+                                // print('hours : ${diff.inHours}');
+                                //
+                                // // show == documents[index]['show'];
+                                // // print(show);
+                                //
+
+                                return InkWell(
                                     onTap: () {
                                       Navigator.push(
                                         context,
@@ -266,35 +362,48 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                 )),
                                       );
                                     },
-                                    child: Column(
-                                      children: [
-                                        Stack(
-                                          children: [
-                                            Container(
-                                              width: MediaQuery.of(context).size.width*0.2,
-                                              height: MediaQuery.of(context).size.height*0.111,
-                                              child: Image.network(
-                                                documents[index]['imageUrl'],
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                            Positioned(
-                                                left: 10,
-                                                bottom: 15,
-                                                right: 10,
-                                                child: FittedBox(
-                                                    child: Text(
-                                                  documents[index]['username'],
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                      // overflow:ellipsis,
-                                                      softWrap: true,
-                                                )))
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ));
+                                    child:  Column(
+                                            children: [
+                                              Stack(
+                                                children: [
+                                                  Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.21,
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.115,
+                                                    child: Image.network(
+                                                      documents[index]
+                                                          ['imageUrl'],
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                  Positioned(
+                                                      left: 10,
+                                                      bottom: 5,
+                                                      right: 10,
+                                                      child: FittedBox(
+                                                        fit: BoxFit.contain,
+                                                          child: Text(
+                                                        documents[index]
+                                                            ['username'],
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                        // overflow:ellipsis,
+                                                        softWrap: true,
+                                                      )))
+                                                ],
+                                              )
+                                            ],
+                                          )
+                                       );
+                              });
                         }),
                   ),
                   Expanded(
@@ -319,35 +428,34 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                               margin:
                                   EdgeInsets.only(top: 15, right: 10, left: 10),
                               width: double.infinity,
-                              child: StreamBuilder  (
+                              child: StreamBuilder(
                                   stream: _lastMessage,
                                   builder: (context, AsyncSnapshot snapshot) {
-                                    if (snapshot.connectionState == ConnectionState.waiting) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
                                       return Center(
                                         child: CircularProgressIndicator(),
                                       );
-                                          }
-                                    if(snapshot.data == null) {
-                                      return Center(child: CircularProgressIndicator());
                                     }
-                                    int indee=0;
-                                    final  documents = snapshot.data!.docs  ;
+                                    if (snapshot.data == null) {
+                                      return Center(
+                                          child: CircularProgressIndicator());
+                                    }
+                                    int indee = 0;
+                                    final documents = snapshot.data!.docs;
                                     // final userDataLastMessage =  FirebaseFirestore.instance
                                     //     .collection('users').doc('userId')
                                     //     .get();
                                     // var isState;
 
-
-
-
                                     print('messages ${documents.length}');
                                     print('last messages ${_lastMessage}');
                                     if (snapshot.hasError) {
-                                      return Text("got error ${snapshot.error}");
+                                      return Text(
+                                          "got error ${snapshot.error}");
                                     }
 
-
-                                    return  ListView.builder(
+                                    return ListView.builder(
                                         scrollDirection: Axis.vertical,
                                         itemCount: documents.length,
                                         itemBuilder: (context, index) {
@@ -356,13 +464,16 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                               Container(
                                                 child: ListTile(
                                                   contentPadding:
-                                                  EdgeInsets.all(5),
+                                                      EdgeInsets.all(5),
                                                   leading: Stack(
                                                     children: [
                                                       CircleAvatar(
                                                         radius: 25,
                                                         backgroundImage:
-                                                        NetworkImage(documents[index]['userImage']),
+                                                            NetworkImage(
+                                                                documents[index]
+                                                                    [
+                                                                    'userImage']),
                                                       ),
                                                       // Positioned(
                                                       //     top: 35,
@@ -381,61 +492,146 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                     ],
                                                   ),
                                                   title: Text(
-                                                    documents[index]['username'],
+                                                    documents[index]
+                                                        ['username'],
                                                     style: TextStyle(
                                                         color: Colors.black,
                                                         fontWeight:
-                                                        FontWeight.normal,
+                                                            FontWeight.normal,
                                                         fontSize: 15),
                                                   ),
                                                   subtitle: Column(
                                                     children: [
-                                                      if (documents[index]['type'] == 'Image' )
+                                                      if (documents[index]
+                                                              ['type'] ==
+                                                          'Image')
                                                         Row(
                                                           mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
+                                                              MainAxisAlignment
+                                                                  .start,
                                                           children: [
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                true)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_read,
+                                                                size: 15,
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                false)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_unread,
+                                                                size: 15,
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .primaryColor,
+                                                              ),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
                                                             Text('Photo',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black87,
                                                                     fontSize:
-                                                                    13)),
+                                                                        13)),
                                                             Icon(Icons.photo,
                                                                 size: 15)
                                                           ],
                                                         ),
-                                                      if (documents[index]['type']  == 'mp3')
+                                                      if (documents[index]
+                                                              ['type'] ==
+                                                          'mp3')
                                                         Row(
                                                           mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
+                                                              MainAxisAlignment
+                                                                  .start,
                                                           children: [
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                true)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_read,
+                                                                size: 15,
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                false)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_unread,
+                                                                size: 15,
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .primaryColor,
+                                                              ),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
                                                             Text('🎵 Audio',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black87,
                                                                     fontSize:
-                                                                    13)),
+                                                                        13)),
                                                             Icon(
                                                                 Icons
                                                                     .music_video_rounded,
                                                                 size: 15)
                                                           ],
                                                         ),
-                                                      if (documents[index]['type']  == 'file')
+                                                      if (documents[index]
+                                                              ['type'] ==
+                                                          'file')
                                                         Row(
                                                           mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
+                                                              MainAxisAlignment
+                                                                  .start,
                                                           children: [
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                true)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_read,
+                                                                size: 15,
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                false)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_unread,
+                                                                size: 15,
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .primaryColor,
+                                                              ),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
                                                             Text('File Pdf',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black87,
                                                                     fontSize:
-                                                                    13)),
+                                                                        13)),
                                                             Icon(
                                                               Icons
                                                                   .picture_as_pdf,
@@ -443,17 +639,46 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                             )
                                                           ],
                                                         ),
-                                                      if (documents[index]['type'] == 'voice' )
+                                                      if (documents[index]
+                                                              ['type'] ==
+                                                          'voice')
                                                         Row(
                                                           mainAxisAlignment:
-                                                          MainAxisAlignment.start,
+                                                              MainAxisAlignment
+                                                                  .start,
                                                           children: [
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                true)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_read,
+                                                                size: 15,
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                false)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_unread,
+                                                                size: 15,
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .primaryColor,
+                                                              ),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
                                                             Text('Voice',
                                                                 style: TextStyle(
                                                                     color: Colors
                                                                         .black87,
                                                                     fontSize:
-                                                                    13)),
+                                                                        13)),
                                                             Icon(
                                                               Icons
                                                                   .keyboard_voice_sharp,
@@ -461,17 +686,51 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                             )
                                                           ],
                                                         ),
-                                                      if (documents[index]['type'] == 'text and image')
+                                                      if (documents[index]
+                                                              ['type'] ==
+                                                          'text and image')
                                                         Row(
                                                           mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
+                                                              MainAxisAlignment
+                                                                  .start,
                                                           children: [
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                true)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_read,
+                                                                size: 15,
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                false)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_unread,
+                                                                size: 15,
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .primaryColor,
+                                                              ),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
                                                             Text(
-                                                              documents[index]['text']!='' ?  documents[index]['text'] :  ' Photo' ,
+                                                              documents[index][
+                                                                          'text'] !=
+                                                                      ''
+                                                                  ? documents[
+                                                                          index]
+                                                                      ['text']
+                                                                  : ' Photo',
                                                               overflow:
-                                                              TextOverflow
-                                                                  .ellipsis,
+                                                                  TextOverflow
+                                                                      .ellipsis,
                                                             ),
                                                             Icon(
                                                               Icons.photo,
@@ -479,28 +738,61 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                             )
                                                           ],
                                                         ),
-                                                      if (documents[index]['type']==
+                                                      if (documents[index]
+                                                              ['type'] ==
                                                           'text')
                                                         Row(
                                                           mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .start,
+                                                              MainAxisAlignment
+                                                                  .start,
                                                           children: [
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                  right:
-                                                                  20),
-                                                              child: Text(
-                                                                documents[index]['text']??'Send First Message',
-                                                                overflow:
-                                                                TextOverflow
-                                                                    .ellipsis,
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .black87,
-                                                                    fontSize:
-                                                                    13),
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                true)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_read,
+                                                                size: 15,
+                                                                color:
+                                                                    Colors.grey,
+                                                              ),
+                                                            if (documents[index]
+                                                                    [
+                                                                    'isRead'] ==
+                                                                false)
+                                                              Icon(
+                                                                Icons
+                                                                    .mark_chat_unread,
+                                                                size: 15,
+                                                                color: Theme.of(
+                                                                        context)
+                                                                    .primaryColor,
+                                                              ),
+                                                            SizedBox(
+                                                              width: 5,
+                                                            ),
+                                                            Flexible(
+                                                              child: Container(
+                                                                width: 300,
+                                                                padding: EdgeInsets
+                                                                    .only(
+                                                                        right:
+                                                                            20),
+                                                                child: Text(
+                                                                  documents[index]
+                                                                          [
+                                                                          'text'] ??
+                                                                      'Send First Message',
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                  style: TextStyle(
+                                                                      color: Colors
+                                                                          .black87,
+                                                                      fontSize:
+                                                                          13),
+                                                                ),
                                                               ),
                                                             ),
                                                           ],
@@ -509,36 +801,87 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                                   ),
                                                   trailing: Text(
                                                     DateFormat("h:mm a").format(
-                                                        documents[index]['timeSend']
+                                                        documents[index]
+                                                                ['timeSend']
                                                             .toDate()),
                                                     style: TextStyle(
                                                         color: Colors.black87,
                                                         fontSize: 10),
                                                   ),
                                                   onTap: () async {
-                                                   await FirebaseFirestore.instance
+                                                    await FirebaseFirestore
+                                                        .instance
                                                         .collection('users')
-                                                        .doc(documents[index]['userId2'])
+                                                        .doc(documents[index]
+                                                            ['userId2'])
                                                         .get()
                                                         .then((value) async {
                                                       if (value.exists) {
                                                         setState(() {
-                                                          peerStats = value.data()!['isStats'];
-
+                                                          peerStats =
+                                                              value.data()![
+                                                                  'isStats'];
                                                         });
                                                       }
                                                     });
+
                                                     await Navigator.of(context)
                                                         .push(MaterialPageRoute(
                                                       builder: (context) =>
                                                           ChatScreen(
-                                                              documents[index]['username']!,
-                                                              documents[index]['userImage']!,
-                                                              documents[index]['userId2']!,
-                                                            documents[index]['userId1']!,
-                                                            isState: peerStats,
-                                                              ),
+                                                        documents[index]
+                                                            ['username']!,
+                                                        documents[index]
+                                                            ['userImage']!,
+                                                        documents[index]
+                                                            ['userId2']!,
+                                                        documents[index]
+                                                            ['userId1']!,
+                                                        isState: peerStats,
+                                                      ),
                                                     ));
+                                                    String peerId =
+                                                        documents[index]
+                                                            ['userId2']!;
+                                                    if (currentUserId
+                                                            .compareTo(peerId) >
+                                                        0) {
+                                                      groupChatId =
+                                                          '$currentUserId-$peerId';
+                                                    } else {
+                                                      groupChatId =
+                                                          '$peerId-$currentUserId';
+                                                    }
+                                                    print(groupChatId);
+
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection(
+                                                            'last_message')
+                                                        .doc(groupChatId)
+                                                        .update({
+                                                      'isRead': !false,
+                                                    });
+
+                                                    // await FirebaseFirestore.instance
+                                                    //      .collection('messages')
+                                                    //      .doc(groupChatId)
+                                                    //      .update({
+                                                    //    'isRead': true,
+                                                    //  });
+
+                                                    // await FirebaseFirestore.instance
+                                                    //     .collection('messages')
+                                                    //     .doc(groupChatId)
+                                                    //     .collection(groupChatId)
+                                                    //      .get()
+                                                    //      .then((idkWhatGoesHereButICantRemoveIt) {
+                                                    //    idkWhatGoesHereButICantRemoveIt.docs.forEach((result) {
+                                                    //      // documents[result]['isRead']==true;
+                                                    //
+                                                    //
+                                                    //    });
+                                                    //  });
                                                   },
                                                 ), //                           <-- Divider
                                               ),
@@ -547,8 +890,6 @@ class _HomeScreenWidgetState extends State<HomeScreenWidget>
                                               // Divider(height: 0.02,color: Colors.grey),
                                             ],
                                           );
-
-
                                         });
                                   })),
                         ],

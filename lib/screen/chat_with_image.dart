@@ -66,12 +66,16 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
             'isStats': userData['isStats'],
             'type': 'text and image',
            'delete': false,
+          'reaction': false,
+          'isRead': false,
+
+
 
         });
 
         await   FirebaseFirestore.instance
             .collection('last_message')
-            .doc('$currentUserId-$peerId')
+            .doc(widget.groupChatId)
             .set({
             'text': _enteredMessage,
             'timeSend': Timestamp.now(),
@@ -79,6 +83,8 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
             'userId2': peerId,
             'userId1': currentUserId,
             'userImage': userDataLastMessage['image_url'],
+          'isRead': false,
+
           'type': 'text and image',});
 
 
@@ -219,17 +225,23 @@ class _ChatWithImageScreenState extends State<ChatWithImageScreen> {
                             :_sendMessage() ;
                           Navigator.of(context).pop();
 
-                          setState(() {
-                             FirebaseFirestore.instance
-                                .collection('last_message')
-                                .doc('$currentUserId-${widget.userId2}')
-                                .update({
-                              'text':_enteredMessage,
-                              'type':'text and image',
-                              'timeSend':Timestamp.now()
-                            });
-                          });
-
+                          // setState(() async{
+                          //
+                          //    await FirebaseFirestore.instance
+                          //       .collection('last_message')
+                          //       .doc('$currentUserId-${widget.userId2}')
+                          //       .update({
+                          //     'isRead':true,
+                          //   });
+                          //    final readMessage= await FirebaseFirestore.instance
+                          //        .collection('messages')
+                          //        .doc(widget.groupChatId).collection(wigroupChatId).doc(widget.id)
+                          //        .update({
+                          //      'delete': true,
+                          //    });
+                          //
+                          // });
+                          //
 
                         },
                         icon: const Icon(Icons.send, size: 25),

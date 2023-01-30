@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:chat_flutter_final/widget/bottom_sheet_attach_file.dart';
+import 'package:chat_flutter_final/widget/replay_message.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -13,12 +14,15 @@ import 'package:image_cacheing/functions/custom_functions.dart';
 import 'package:social_media_recorder/audio_encoder_type.dart';
 import 'package:social_media_recorder/screen/social_media_recorder.dart';
 
+import 'message.dart';
+
 class NewMessage extends StatefulWidget {
   final String username;
   final String image;
   final String userId2;
   final String groupChatId;
   final bool isStats;
+
 
   const NewMessage(
       this.username, this.image, this.userId2, this.groupChatId, this.isStats,
@@ -96,12 +100,14 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'isStats': userData['isStats'],
             'type': 'text',
             'delete': false,
+            'isRead': false,
+            'reaction': false,
           });
 
 
           FirebaseFirestore.instance
               .collection('last_message')
-              .doc('$currentUserId-$peerId')
+              .doc(widget.groupChatId)
               .set({
             'text': _enteredMessage,
             'timeSend': Timestamp.now(),
@@ -110,6 +116,8 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'userId1': currentUserId,
             'userImage': userDataLastMessage['image_url'],
             'type': 'text',
+            'isRead': false,
+
           });
 
 
@@ -125,6 +133,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
 
 
           _controller.clear();
+
           setState(() {
             _enteredMessage = '';
           });
@@ -183,12 +192,15 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'isStats': userData['isStats'],
             'delete': false,
             'type': 'voice',
-          });
+           'isRead': false,
+           'reaction': false,
+
+        });
 
 
         await  FirebaseFirestore.instance
               .collection('last_message')
-            .doc('$currentUserId-$peerId')
+            .doc(widget.groupChatId)
             .set({
             'text': url,
             'timeSend': Timestamp.now(),
@@ -196,6 +208,8 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
             'userId2': peerId,
             'userId1': currentUserId,
             'userImage': userDataLastMessage['image_url'],
+          'isRead': false,
+
           'type': 'voice',});
           _controller.clear();
           setState(() {
@@ -220,6 +234,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+
     return Column(
         mainAxisAlignment: MainAxisAlignment.end, children: [
       ConstrainedBox(
@@ -237,6 +252,7 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                       controller: _controller,
                       autocorrect: true,
                       enableSuggestions: true,
+
                       textCapitalization: TextCapitalization.sentences,
                       decoration: InputDecoration(
                           hintText: 'Send a message...',
@@ -282,7 +298,13 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                               borderSide: BorderSide(
                                   color: Theme.of(context).primaryColor,
                                   width: 1),
-                              borderRadius: BorderRadius.circular(30))),
+                              // borderRadius: BorderRadius.circular(30)
+
+                          borderRadius: BorderRadius.all(Radius.circular(30))
+
+                      ),
+
+                      ),
                       onChanged: (val) {
                         if (val.length > 0 && val != '') {
                           setState(() {
@@ -314,11 +336,13 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
 
                                     await FirebaseFirestore.instance
                                         .collection('last_message')
-                                        .doc('${signedInUser.uid}-${widget.userId2}')
+                                        .doc(widget.groupChatId)
                                         .update({
                                       'text':url,
                                       'type':'voice',
                                       'timeSend':Timestamp.now(),
+                                      'isRead': false,
+
 
                                     });
 
@@ -328,7 +352,6 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                                encode: AudioEncoderType.AAC,
                                recordIcon: Icon(Icons.mic_rounded,color: Colors.pink,),
                                cancelTextBackGroundColor: Colors.red,
-                               backGroundColor:Colors.white,
                                counterTextStyle: TextStyle(color: Colors.pink),
                                recordIconBackGroundColor: Colors.white,
                                sendButtonIcon: Icon(Icons.send,color: Colors.white,textDirection: TextDirection.ltr),
@@ -356,18 +379,19 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
                   onPressed:  () {
                     _sendMessage();
 
-                    setState(() async {
-                     await FirebaseFirestore.instance
+                    setState(()  {
+                      FirebaseFirestore.instance
                          .collection('last_message')
-                         .doc('${signedInUser.uid}-${widget.userId2}')
+                         .doc(widget.groupChatId)
                           .update({
                         'text':_enteredMessage,
-                        'timeSend':Timestamp.now()
+                        'timeSend':Timestamp.now(),
+                        'isRead':false
                       });
                     });
                     _scrollController.animateTo(
                         _scrollController.position.maxScrollExtent,
-                        duration: Duration(milliseconds: 300),
+                        duration: Duration(milliseconds: 200),
                         curve: Curves.easeInOut);
 
                     },
@@ -414,6 +438,5 @@ class _NewMessageState extends State<NewMessage> with WidgetsBindingObserver {
       ),
     ]);
   }
-
 
 }

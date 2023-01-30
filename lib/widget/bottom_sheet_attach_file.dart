@@ -109,11 +109,14 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
           'isStats': userData['isStats'],
           'delete': false,
           'type': type,
+          'isRead': false,
+          'reaction': false,
+
         });
 
         await FirebaseFirestore.instance
             .collection('last_message')
-            .doc('$currentUserId-$peerId')
+            .doc(widget.groupChatId)
             .set({
           'text': url,
           'timeSend': Timestamp.now(),
@@ -121,19 +124,23 @@ class _BottomSheetAttachFileState extends State<BottomSheetAttachFile> {
           'userId2': peerId,
           'userId1': currentUserId,
           'userImage': userDataLastMessage['image_url'],
+          'isRead': false,
+
           'type': type,});
 
-        setState(() async{
-
-          await FirebaseFirestore.instance
-              .collection('last_message')
-              .doc('$currentUserId-$peerId')
-              .update({
-            'text':url,
-            'type':type,
-            'timeSend':Timestamp.now()
-          });
-        });
+        // setState(() async{
+        //
+        //   await FirebaseFirestore.instance
+        //       .collection('last_message')
+        //       .doc('$currentUserId-$peerId')
+        //       .update({
+        //     'text':url,
+        //     'type':type,
+        //     'isRead': false,
+        //
+        //     'timeSend':Timestamp.now()
+        //   });
+        // });
 
 
 

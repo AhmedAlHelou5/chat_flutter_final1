@@ -10,95 +10,94 @@ import 'home_screen_with_nav_bottom.dart';
 
 class AddStory extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() =>_AddStoryState();
+  State<StatefulWidget> createState() => _AddStoryState();
 }
 
-class _AddStoryState extends State<AddStory>  with WidgetsBindingObserver {
+class _AddStoryState extends State<AddStory> with WidgetsBindingObserver {
   final _auth = FirebaseAuth.instance;
   late User signedInUser;
 
   final currentUserId = FirebaseAuth.instance.currentUser!.uid;
 
   void SetStatus(bool status) {
-  FirebaseFirestore.instance.collection('users').doc(currentUserId).update({
-  'isStats': status,
-  });
+    FirebaseFirestore.instance.collection('users').doc(currentUserId).update({
+      'isStats': status,
+    });
   }
 
   void getCurrentUser() {
-  try {
-  final user = _auth.currentUser;
-  if (user != null) {
-  signedInUser = user;
-  }
-  } catch (e) {
-  print("Error getting current user: $e ");
-  }
+    try {
+      final user = _auth.currentUser;
+      if (user != null) {
+        signedInUser = user;
+      }
+    } catch (e) {
+      print("Error getting current user: $e ");
+    }
   }
 
   bool? _isConnected;
 
   void _checkInternetConnection() async {
-  try {
-  final response = await InternetAddress.lookup('www.google.com');
-  if (response.isNotEmpty) {
-  setState(() {
-  _isConnected = true;
-  SetStatus(true);
-  });
-  }
-  } on SocketException catch (err) {
-  setState(() {
-  _isConnected = false;
-  SetStatus(false);
-  });
-  if (kDebugMode) {
-  print(err);
-  }
-  }
+    try {
+      final response = await InternetAddress.lookup('www.google.com');
+      if (response.isNotEmpty) {
+        setState(() {
+          _isConnected = true;
+          SetStatus(true);
+        });
+      }
+    } on SocketException catch (err) {
+      setState(() {
+        _isConnected = false;
+        SetStatus(false);
+      });
+      if (kDebugMode) {
+        print(err);
+      }
+    }
   }
 
   @override
   void initState() {
-  // TODO: implement initState
-  super.initState();
-  _checkInternetConnection();
-  getCurrentUser();
-  WidgetsBinding.instance.addObserver(this);
-  SetStatus(true);
+    // TODO: implement initState
+    super.initState();
+    _checkInternetConnection();
+    getCurrentUser();
+    WidgetsBinding.instance.addObserver(this);
+    SetStatus(true);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-  // TODO: implement didChangeAppLifecycleState
-  super.didChangeAppLifecycleState(state);
-  if (state == AppLifecycleState.resumed && _isConnected == true) {
-  SetStatus(true);
-  } else {
-  SetStatus(false);
-  }
+    // TODO: implement didChangeAppLifecycleState
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed && _isConnected == true) {
+      SetStatus(true);
+    } else {
+      SetStatus(false);
+    }
   }
 
   @override
   void dispose() {
-  // TODO: implement dispose
-  SetStatus(false);
-  super.dispose();
+    // TODO: implement dispose
+    SetStatus(false);
+    super.dispose();
   }
 
   @override
   void deactivate() {
-  // TODO: implement deactivate
-  SetStatus(false);
+    // TODO: implement deactivate
+    SetStatus(false);
 
-  super.deactivate();
+    super.deactivate();
   }
-
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    final userData=FirebaseFirestore.instance.collection('users').snapshots();
+    final userData = FirebaseFirestore.instance.collection('users').snapshots();
 
     return Scaffold(
       appBar: PreferredSize(
@@ -108,17 +107,13 @@ class _AddStoryState extends State<AddStory>  with WidgetsBindingObserver {
             elevation: 3,
             title: Text('Add Story'),
             centerTitle: true,
-
             actions: [
               Container(
                 margin: EdgeInsets.only(right: 15),
                 child: DropdownButton(
                   underline: Container(),
                   icon: Icon(Icons.menu,
-                      color: Theme
-                          .of(context)
-                          .primaryIconTheme
-                          .color,
+                      color: Theme.of(context).primaryIconTheme.color,
                       size: 27),
                   items: [
                     DropdownMenuItem(
@@ -147,10 +142,8 @@ class _AddStoryState extends State<AddStory>  with WidgetsBindingObserver {
               ),
             ]),
       ),
-
-
-      body:  InkWell(
-        onTap: (){
+      body: InkWell(
+        onTap: () {
           showModalBottomSheet(
             backgroundColor: Colors.transparent,
             context: context,
@@ -158,32 +151,36 @@ class _AddStoryState extends State<AddStory>  with WidgetsBindingObserver {
           );
         },
         child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
               Container(
                 width: 200,
                 height: 200,
-                child: Image.asset('assets/images/a.png',),
+                child: Image.asset(
+                  'assets/images/a.png',
+                ),
               ),
-
               Container(
                 child: TextButton(
-                        onPressed: () {
-                          showModalBottomSheet(
-                            backgroundColor: Colors.transparent,
-                            context: context,
-                            builder: (builder) => BottomSheetForStoryPick(),
-                          );
-                          Navigator.of(context).pop();
-
-                        },
-                        child: Text('Add Story', style: TextStyle(color: Colors.pink,fontSize: 20,)),
-                      ),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      backgroundColor: Colors.transparent,
+                      context: context,
+                      builder: (builder) => BottomSheetForStoryPick(),
+                    );
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('Add Story',
+                      style: TextStyle(
+                        color: Colors.pink,
+                        fontSize: 20,
+                      )),
+                ),
               ),
-              ],
-            ),
+            ],
           ),
+        ),
       ),
     );
   }

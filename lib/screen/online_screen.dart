@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:chat_flutter_final/screen/home_screen_with_nav_bottom.dart';
+import 'package:chat_flutter_final/screen/profile_screen.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -123,12 +125,27 @@ class _OnlineScreenState extends State<OnlineScreen>
                           children: const [
                             Icon(
                               Icons.exit_to_app,
-                              color: Colors.black,
+                              color: Colors.pink,
                             ),
                             SizedBox(
                               width: 8,
                             ),
                             Text('Logout'),
+                          ],
+                        ),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Settings',
+                        child: Row(
+                          children: const [
+                            Icon(
+                              Icons.settings,
+                              color: Colors.pink,
+                            ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text('Settings'),
                           ],
                         ),
                       )
@@ -138,8 +155,15 @@ class _OnlineScreenState extends State<OnlineScreen>
                         SetStatus(false);
                         await FirebaseAuth.instance.signOut();
                       }
+                      if (itemIdentifier == 'Settings') {
+                        await Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>HomeScreenWithNavBottom(currentPage: 3)
+
+                        ));
+                      }
                     },
                   ),
+
                 ),
               ]),
         ),
@@ -167,7 +191,7 @@ class _OnlineScreenState extends State<OnlineScreen>
                 Card(
                   elevation: 5,
                   child: Container(
-                      height: MediaQuery.of(context).size.height * 0.73,
+                      height: MediaQuery.of(context).size.height * 0.75,
                       margin: EdgeInsets.only(
                           top: 15, right: 10, left: 10),
                       width: double.infinity,

@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
                 return SplashScreen();
               }
               if (userSnapshot.hasData) {
-                return HomeScreenWithNavBottom();
+                return HomeScreenWithNavBottom(currentPage: 0);
               }
               return AuthScreen();
             }),

@@ -70,8 +70,7 @@ class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
           await FirebaseFirestore.instance
               .collection('stories')
               .doc(currentUserId)
-              .collection(currentUserId)
-              .add({
+              .set({
             'file': url,
             'createdAt': Timestamp.now(),
             'username': userData['username'],
@@ -128,38 +127,38 @@ class _BottomSheetForStoryPickState extends State<BottomSheetForStoryPick>{
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  InkWell(
-                    onTap: () async {
-                      getfile();
-                    },
-                    child: Column(
-                      children: const [
-                        CircleAvatar(
-                          radius: 30,
-                          backgroundColor: Colors.indigo,
-                          child: Icon(
-                            Icons.videocam,
-                            // semanticLabel: "Help",
-                            size: 29,
-                            color: Colors.white,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Text(
-                          'Video',
-                          style: TextStyle(
-                            fontSize: 12,
-                            // fontWeight: FontWeight.w100,
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: 30,
-                  ),
+                  // InkWell(
+                  //   onTap: () async {
+                  //   await  getfile();
+                  //   },
+                  //   child: Column(
+                  //     children: const [
+                  //       CircleAvatar(
+                  //         radius: 30,
+                  //         backgroundColor: Colors.indigo,
+                  //         child: Icon(
+                  //           Icons.videocam,
+                  //           // semanticLabel: "Help",
+                  //           size: 29,
+                  //           color: Colors.white,
+                  //         ),
+                  //       ),
+                  //       SizedBox(
+                  //         height: 5,
+                  //       ),
+                  //       Text(
+                  //         'Video',
+                  //         style: TextStyle(
+                  //           fontSize: 12,
+                  //           // fontWeight: FontWeight.w100,
+                  //         ),
+                  //       )
+                  //     ],
+                  //   ),
+                  // ),
+                  // SizedBox(
+                  //   width: 30,
+                  // ),
                   InkWell(
                     onTap: () async {
                       File? _pickedImage;

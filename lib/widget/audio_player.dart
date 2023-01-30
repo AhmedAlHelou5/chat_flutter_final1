@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:voice_message_package/voice_message_package.dart';
+import 'package:just_audio_cache/just_audio_cache.dart';
+import 'package:just_audio/just_audio.dart';
 
 class AudioPlayers extends StatefulWidget {
   final String? url;
@@ -12,6 +14,20 @@ class AudioPlayers extends StatefulWidget {
 }
 
 class _AudioPlayersState extends State<AudioPlayers> {
+  late final AudioPlayer _player;
+
+  void _play() async {
+    // dynamic set your audio source
+    await _player.dynamicSet( url: widget.url!);
+    await _player.play();
+    setState(() {
+      _player.existedInLocal(url:  widget.url!);
+      _player.cacheFile( url: widget.url!);
+    });
+    await _player.getCachedPath(url:widget.url! );
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return VoiceMessage(
@@ -23,8 +39,12 @@ class _AudioPlayersState extends State<AudioPlayers> {
           contactFgColor: Colors.pink,
           contactPlayIconColor: Colors.white,
           contactBgColor: Theme.of(context).disabledColor,
-
+      // onPlay: (){
+      //       _play();
+      // },
     );
+
+
     //   AudioWidget.network(
     //   url: widget.url!,
     //   play: _play,
