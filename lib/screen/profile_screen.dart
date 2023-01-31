@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../widget/user_image_picker.dart';
@@ -21,11 +22,43 @@ class _ProfileScreenState extends State<ProfileScreen>
     with WidgetsBindingObserver {
   final _auth = FirebaseAuth.instance;
   late User signedInUser;
-
+  final _formKey = GlobalKey<FormState>();
   String? image = '';
   String? username = '';
   String? email = '';
   String? phone = '';
+
+  // late final void Function(
+  //     String phone,
+  //     String username,
+  //     BuildContext ctx,
+  //     ) submitFn;
+
+
+  // Future<void> _trySubmit() async {
+  //   var isValid = _formKey.currentState!.validate();
+  //   FocusScope.of(context).unfocus();
+  //
+  //   if ( _enteredPhone.length !=10 && !_enteredPhone.startsWith('059') ) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text('Please check the phone  number.'),
+  //         backgroundColor: Theme.of(context).errorColor,
+  //       ),
+  //     );
+  //     return ;
+  //   }
+  //
+  //   if (isValid) {
+  //     _formKey.currentState!.save();
+  //     submitFn(
+  //       _enteredPhone,
+  //       _enteredUsername,
+  //       context,
+  //     );
+  //   }
+  //   print(isValid);
+  // }
 
   Future _getDataFromDatabase() async {
     await FirebaseFirestore.instance
@@ -128,7 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   final _controllerPhone = TextEditingController();
   var enabledEdit = false;
   File? _userImageFile;
-  final _formKey = GlobalKey<FormState>();
+  // final _formKey = GlobalKey<FormState>();
 
   void _pickedImage(File? image) {
     _userImageFile = image;
@@ -162,7 +195,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         .doc(currentUserId)
         .update({
       'username': _enteredUsername.isNotEmpty ? FullName:username,
-      'phone': _enteredPhone.isNotEmpty ?phoneNo:phone ,
+      'phone': _enteredPhone.length>=10 ? phoneNo: phone ,
       'userId': currentUserId,
     });
 
@@ -196,20 +229,14 @@ class _ProfileScreenState extends State<ProfileScreen>
 
 
 
-
-
-    //   await FirebaseFirestore.instance
-  //       .collection('last_message').doc(currentUserId).
-  //       update({
-  //     'username':_enteredUsername
-  // });
-
-    Fluttertoast.showToast(
+  await  Fluttertoast.showToast(
       msg: "Done Edit",
       textColor: Colors.red,
     );
 
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -350,6 +377,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                 ),
 
 
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -366,7 +394,18 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     ElevatedButton(
                       onPressed: () {
+                        if(_enteredPhone.length==10 && _enteredPhone.startsWith('059')){
                         _submitAuthForm( _enteredPhone, _enteredUsername);
+                          Fluttertoast.showToast(
+                          msg: "Done Edit",
+                          textColor: Colors.red,
+                        );}
+                        else{
+                          Fluttertoast.showToast(
+                            msg: "phone must be of 10 numbers and Start 059",
+                            textColor: Colors.red,
+                          );
+                        }
                       },
                       child: Text(
                         "SAVE",
@@ -398,7 +437,7 @@ class _ProfileScreenState extends State<ProfileScreen>
             contentPadding: EdgeInsets.only(bottom: 3),
             labelText: 'Full Name',
             floatingLabelBehavior: FloatingLabelBehavior.always,
-            hintText: username!,
+            // hintText: username!,
             hintStyle: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.normal,
@@ -422,41 +461,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     );
   }
 
-  // Widget buildTextFieldEmail() {
-  //   return Padding(
-  //     padding: const EdgeInsets.only(bottom: 35.0),
-  //     child: TextFormField(
-  //       key: ValueKey('email'),
-  //       keyboardType: TextInputType.emailAddress,
-  //
-  //       decoration: InputDecoration(
-  //           contentPadding: EdgeInsets.only(bottom: 3),
-  //           labelText: 'E-mail',
-  //           floatingLabelBehavior: FloatingLabelBehavior.always,
-  //           hintText: email,
-  //           hintStyle: TextStyle(
-  //             fontSize: 16,
-  //             fontWeight: FontWeight.normal,
-  //             color: Colors.black,
-  //           )),
-  //       controller: _controllerEmail,
-  //         onChanged: (val) {
-  //           validateEmail(val);
-  //
-  //           if (val.length > 12 && val != '') {
-  //             setState(() {
-  //               _enteredEmail =  val;
-  //             });
-  //           } else {
-  //             setState(() {
-  //               _enteredEmail = email!;
-  //             });
-  //           }
-  //         }
-  //
-  //     ),
-  //   );
-  // }
+
 
   Widget buildTextFieldPhone(){
     return Padding(
@@ -465,22 +470,54 @@ class _ProfileScreenState extends State<ProfileScreen>
         key: ValueKey('phone'),
           keyboardType: TextInputType.number,
           maxLength: 10,
-        decoration: InputDecoration(
+          // validator: (String? value) {
+          //   if (value!.length != 10 && !_enteredPhone.startsWith('059')) {
+          //     return 'Mobile Number must be of 10 digit and Start 059';
+          //   } else {
+          //     return '';
+          //   }
+          // },
+          onSaved: (value) {
+            phone = value!;
+          },
+          validator: (value) {
+            if (value!.length != 10 && !_enteredPhone.startsWith('059')) {
+              return 'Mobile Number must be of 10 digit and Start 059';
+            }
+            return null;
+          },
+
+          decoration: InputDecoration(
             contentPadding: EdgeInsets.only(bottom: 3),
             labelText: 'Phone',
             floatingLabelBehavior: FloatingLabelBehavior.always,
             hintText: phone ?? 'add Phone',
+
             hintStyle: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.normal,
               color: Colors.black,
+
             )),
+          inputFormatters: <TextInputFormatter>[
+            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+            FilteringTextInputFormatter.digitsOnly
+          ],
         controller: _controllerPhone,
+
+          // validator: (String? value) {
+          //   return (value != null && value.contains('059')) ? 'Do not use the (.) char.' : null;
+          // },
           onChanged: (val) {
-            if (val.length > 9 && val.length < 11 && val != '') {
+            if (val.length >= 10 && val.length < 11 && val != '') {
               setState(() {
-                _enteredPhone = '+97 $val';
+                _enteredPhone = '$val';
               });
+              // Fluttertoast.showToast(
+              //   msg: "failed  Edit",
+              //   textColor: Colors.red,
+              // );
+
             } else {
               setState(() {
                 _enteredPhone = '+97 $phone';
@@ -508,4 +545,12 @@ class _ProfileScreenState extends State<ProfileScreen>
   //     });
   //   }
   // }
+  String validateMobile(String value) {
+// Indian Mobile number are of 10 digit only
+    if (value.length != 10) {
+      return 'Mobile Number must be of 10 digit and Start 059';
+    } else {
+      return '';
+    }
+  }
 }

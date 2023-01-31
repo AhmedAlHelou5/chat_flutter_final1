@@ -107,7 +107,7 @@ class _SearchScreenState extends State<SearchScreen>
   Widget build(BuildContext context) {
     final _usersStream = FirebaseFirestore.instance
         .collection('users')
-        .where('username', isGreaterThanOrEqualTo: _enteredMessage.trim())
+        .where('username', isEqualTo: _enteredMessage.trim())
         .snapshots();
 
     return Scaffold(
