@@ -1,6 +1,7 @@
 import 'package:chat_flutter_final/screen/add_story.dart';
 import 'package:chat_flutter_final/screen/profile_screen.dart';
 import 'package:chat_flutter_final/screen/search_screen.dart';
+import 'package:chat_flutter_final/screen/search_test.dart';
 import 'package:fancy_bottom_navigation/fancy_bottom_navigation.dart';
 import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +79,7 @@ class _HomeScreenWithNavBottomState extends State<HomeScreenWithNavBottom> {
       case 1:
         return OnlineScreen();
       case 2:
-        return SearchScreen();
+        return Search();
         case 3:
         return ProfileScreen();
       default:
