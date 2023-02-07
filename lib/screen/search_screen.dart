@@ -107,7 +107,7 @@ class _SearchScreenState extends State<SearchScreen>
   Widget build(BuildContext context) {
     final _usersStream = FirebaseFirestore.instance
         .collection('users')
-        .where('username', isEqualTo: _enteredMessage.trim())
+        .where('username', isEqualTo: _enteredMessage.substring(0,_enteredMessage.length).toUpperCase())
         .snapshots();
 
     return Scaffold(
@@ -312,8 +312,7 @@ class _SearchScreenState extends State<SearchScreen>
                                 builder: (context) =>
                                     ChatScreen(
                                         documents[index]
-                                        [
-                                        'username'],
+                                        ['username'],
                                         documents[index]
                                         [
                                         'image_url'],
